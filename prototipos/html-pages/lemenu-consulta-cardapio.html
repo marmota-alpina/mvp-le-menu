@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Le Menu - Cardápio Semanal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'roboto': ['Roboto', 'sans-serif'],
+                    },
+                    colors: {
+                        'restaurant': {
+                            'primary': '#8B4513',
+                            'secondary': '#D2691E',
+                            'accent': '#FF6B35',
+                            'light': '#FFF5E6',
+                            'green': '#4A7C59',
+                            'dark': '#3E2723'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .day-card {
+            transition: all 0.3s ease;
+        }
+        .day-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        .meal-type-active {
+            background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);
+            color: white;
+        }
+        .tag-diet {
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(-10px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-restaurant-light">
+    <!-- Header -->
+    <header class="bg-white shadow-md sticky top-0 z-50" role="banner">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <a href="index.html" class="flex items-center space-x-2" aria-label="Página inicial">
+                    <svg class="w-8 h-8 text-restaurant-primary" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                        <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                        <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 1 1 0 000 2H6a2 2 0 100 4h2a2 2 0 100-4h-.5a1 1 0 000-2H8a2 2 0 012-2h2a2 2 0 012 2v9a2 2 0 01-2 2H6a2 2 0 01-2-2V5z"/>
+                    </svg>
+                    <h1 class="text-xl md:text-2xl font-bold text-restaurant-dark">Le Menu</h1>
+                </a>
+                <nav class="hidden md:flex items-center space-x-6" role="navigation" aria-label="Menu principal">
+                    <a href="lemenu-consulta-cardapio.html" class="text-restaurant-primary font-medium" aria-current="page" id="nav-cardapio">Cardápio</a>
+                    <a href="lemenu-gestao-avisos.html" class="text-gray-600 hover:text-restaurant-primary transition-colors" id="nav-avisos">Avisos</a>
+                    <a href="lemenu-consultar-avaliacoes.html" class="text-gray-600 hover:text-restaurant-primary transition-colors" id="nav-avaliacoes">Avaliações</a>
+                </nav>
+                <!-- Mobile menu button -->
+                <button class="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                        onclick="toggleMobileMenu()"
+                        aria-label="Abrir menu de navegação"
+                        aria-expanded="false"
+                        aria-controls="mobile-menu"
+                        id="mobile-menu-button">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+                <div class="hidden md:flex items-center space-x-3">
+                    <span class="text-sm text-gray-600">Olá, João Silva</span>
+                    <button onclick="handleLogout()" class="p-2 hover:bg-gray-100 rounded-lg transition-colors" aria-label="Sair do sistema">
+                        <i class="fas fa-sign-out-alt text-restaurant-primary" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </div>
+            <!-- Mobile Navigation Menu -->
+            <div class="md:hidden hidden mt-4 pb-4 border-t" id="mobile-menu" role="navigation" aria-label="Menu de navegação móvel">
+                <div class="flex flex-col space-y-2 mt-4">
+                    <a href="lemenu-consulta-cardapio.html" class="block py-2 px-4 text-restaurant-primary font-medium rounded-lg bg-restaurant-light" aria-current="page">Cardápio</a>
+                    <a href="lemenu-gestao-avisos.html" class="block py-2 px-4 text-gray-600 hover:text-restaurant-primary hover:bg-gray-50 rounded-lg transition-colors">Avisos</a>
+                    <a href="lemenu-consultar-avaliacoes.html" class="block py-2 px-4 text-gray-600 hover:text-restaurant-primary hover:bg-gray-50 rounded-lg transition-colors">Avaliações</a>
+                    <div class="mt-2 pt-2 border-t border-gray-200">
+                        <span class="block py-2 px-4 text-sm text-gray-600">Olá, João Silva</span>
+                        <button onclick="handleLogout()" class="w-full text-left py-2 px-4 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                            <i class="fas fa-sign-out-alt mr-2" aria-hidden="true"></i>Sair
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navegação Breadcrumb -->
+    <nav class="bg-white border-b" aria-label="Breadcrumb">
+        <div class="container mx-auto px-4 py-2">
+            <ol class="flex items-center space-x-2 text-sm">
+                <li>
+                    <a href="index.html" class="text-gray-500 hover:text-restaurant-primary transition-colors">
+                        <i class="fas fa-home" aria-hidden="true"></i>
+                        <span class="sr-only">Início</span>
+                    </a>
+                </li>
+                <li>
+                    <span class="text-gray-400 mx-2">/</span>
+                </li>
+                <li>
+                    <span class="text-restaurant-primary font-medium" aria-current="page">Cardápio Semanal</span>
+                </li>
+            </ol>
+        </div>
+    </nav>
+
+    <!-- Cabeçalho da Página -->
+    <div class="container mx-auto px-4 py-6">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+                <h2 class="text-2xl font-bold text-restaurant-dark">Cardápio Semanal</h2>
+                <p class="text-gray-600 mt-1">Consulte os pratos do RU por dia e refeição. Gestores podem publicar ou editar o cardápio da semana.</p>
+            </div>
+            <div class="flex items-center gap-2 sm:ml-auto">
+              <a href="lemenu-cadastro-cardapio.html" class="bg-restaurant-primary hover:bg-restaurant-dark text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2" aria-label="Cadastrar novo cardápio semanal">
+                  <i class="fas fa-plus" aria-hidden="true"></i>
+                  <span>Cadastrar Cardápio</span>
+              </a>
+              <a href="lemenu-avaliar-refeicao.html" class="bg-white text-restaurant-primary border border-restaurant-primary hover:bg-restaurant-light px-4 py-2 rounded-lg transition-colors flex items-center gap-2" aria-label="Avaliar refeições">
+                  <i class="fas fa-star" aria-hidden="true"></i>
+                  <span>Avaliar refeições</span>
+              </a>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Navegação de Semana -->
+    <section class="bg-white border-b">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <button onclick="changeWeek(-1)" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+                    <div class="text-center">
+                        <h2 class="font-bold text-lg text-restaurant-dark">Semana Atual</h2>
+                        <p class="text-sm text-gray-600" id="weekRange">30 Set - 04 Out 2024</p>
+                    </div>
+                    <button onclick="changeWeek(1)" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="flex items-center gap-2">
+                    <label for="filterMeal" class="text-sm text-gray-600">Filtrar por:</label>
+                    <select id="filterMeal"
+                            name="filterMeal"
+                            onchange="filterByMealType()"
+                            aria-label="Filtrar refeições por tipo"
+                            class="px-3 py-1 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-restaurant-primary focus:border-transparent">
+                        <option value="todos">Todas as Refeições</option>
+                        <option value="cafe">Café da Manhã</option>
+                        <option value="almoco">Almoço</option>
+                        <option value="jantar">Jantar</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tabs de Tipo de Refeição (Mobile) -->
+    <div class="md:hidden bg-white border-b overflow-x-auto">
+        <div class="flex px-4 py-2 gap-2">
+            <button onclick="setMealFilter('todos')" class="meal-tab px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap meal-type-active">
+                Todos
+            </button>
+            <button onclick="setMealFilter('cafe')" class="meal-tab px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap bg-gray-100">
+                Café
+            </button>
+            <button onclick="setMealFilter('almoco')" class="meal-tab px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap bg-gray-100">
+                Almoço
+            </button>
+            <button onclick="setMealFilter('jantar')" class="meal-tab px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap bg-gray-100">
+                Jantar
+            </button>
+        </div>
+    </div>
+
+    <!-- Grid de Cardápio Semanal -->
+    <main class="container mx-auto px-4 py-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Segunda-feira -->
+            <div class="day-card bg-white rounded-xl shadow-sm overflow-hidden fade-in" data-day="segunda">
+                <div class="bg-gradient-to-r from-restaurant-primary to-restaurant-secondary text-white p-4">
+                    <h3 class="font-bold text-lg">Segunda-feira</h3>
+                    <p class="text-sm opacity-90">30 de Setembro</p>
+                </div>
+
+                <!-- Café da Manhã -->
+                <div class="meal-section border-b" data-meal="cafe">
+                    <div class="p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="font-semibold text-gray-800 flex items-center gap-2">
+                                <i class="fas fa-coffee text-brown-600"></i> Café da Manhã
+                            </h4>
+                            <span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">6:30 - 8:30</span>
+                        </div>
+                        <ul class="space-y-2 text-sm text-gray-700">
+                            <li class="flex items-start gap-2">
+                                <span class="text-restaurant-primary">•</span>
+                                <span>Pão francês com manteiga</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-restaurant-primary">•</span>
+                                <span>Café com leite</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-restaurant-primary">•</span>
+                                <span>Frutas da estação</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Almoço -->
+                <div class="meal-section border-b" data-meal="almoco">
+                    <div class="p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="font-semibold text-gray-800 flex items-center gap-2">
+                                <i class="fas fa-utensils text-green-600"></i> Almoço
+                            </h4>
+                            <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">11:00 - 14:00</span>
+                        </div>
+                        <div class="space-y-3">
+                            <div>
+                                <p class="font-medium text-gray-800">Principal:</p>
+                                <p class="text-sm text-gray-700 ml-4">Frango Grelhado</p>
+                                <div class="flex gap-1 ml-4 mt-1">
+                                    <span class="tag-diet text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full">430 kcal</span>
+                                </div>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-800">Acompanhamento:</p>
+                                <p class="text-sm text-gray-700 ml-4">Arroz integral, Feijão preto</p>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-800">Vegetariano:</p>
+                                <p class="text-sm text-gray-700 ml-4">Omelete com Queijo e Legumes</p>
+                                <div class="flex gap-1 ml-4 mt-1">
+                                    <span class="tag-diet text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">Vegetariano</span>
+                                </div>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-800">Sobremesa:</p>
+                                <p class="text-sm text-gray-700 ml-4">Pudim de Leite</p>
+                            </div>
+                        </div>
+                        <button onclick="showNutritionalInfo('almoco-segunda')" class="mt-3 text-xs text-restaurant-primary hover:text-restaurant-dark font-medium">
+                            Ver informações nutricionais →
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Jantar -->
+                <div class="meal-section" data-meal="jantar">
+                    <div class="p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="font-semibold text-gray-800 flex items-center gap-2">
+                                <i class="fas fa-moon text-purple-600"></i> Jantar
+                            </h4>
+                            <span class="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded">18:00 - 20:00</span>
+                        </div>
+                        <ul class="space-y-2 text-sm text-gray-700">
+                            <li class="flex items-start gap-2">
+                                <span class="text-restaurant-primary">•</span>
+                                <span>Sopa de Legumes</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-restaurant-primary">•</span>
+                                <span>Pão integral</span>
+                                <span class="text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full ml-2">Integral</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-restaurant-primary">•</span>
+                                <span>Chá ou Suco</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Terça-feira -->
+            <div class="day-card bg-white rounded-xl shadow-sm overflow-hidden fade-in" data-day="terca">
+                <div class="bg-gradient-to-r from-restaurant-primary to-restaurant-secondary text-white p-4">
+                    <h3 class="font-bold text-lg">Terça-feira</h3>
+                    <p class="text-sm opacity-90">01 de Outubro</p>
+                </div>
+
+                <!-- Similar structure for other meals -->
+                <div class="meal-section border-b" data-meal="cafe">
+                    <div class="p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="font-semibold text-gray-800 flex items-center gap-2">
+                                <span class="text-2xl">☕</span> Café da Manhã
+                            </h4>
+                            <span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">6:30 - 8:30</span>
+                        </div>
+                        <ul class="space-y-2 text-sm text-gray-700">
+                            <li class="flex items-start gap-2">
+                                <span class="text-restaurant-primary">•</span>
+                                <span>Tapioca com queijo</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-restaurant-primary">•</span>
+                                <span>Vitamina de banana</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="meal-section border-b" data-meal="almoco">
+                    <div class="p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="font-semibold text-gray-800 flex items-center gap-2">
+                                <i class="fas fa-utensils text-green-600"></i> Almoço
+                            </h4>
+                            <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">11:00 - 14:00</span>
+                        </div>
+                        <div class="space-y-3">
+                            <div>
+                                <p class="font-medium text-gray-800">Principal:</p>
+                                <p class="text-sm text-gray-700 ml-4">Carne Moída com Batatas</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-700 ml-4">Escondidinho de Soja</p>
+                                <div class="flex gap-1 ml-4 mt-1">
+                                    <span class="tag-diet text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">Sem Lactose</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="meal-section" data-meal="jantar">
+                    <div class="p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="font-semibold text-gray-800 flex items-center gap-2">
+                                <i class="fas fa-moon text-purple-600"></i> Jantar
+                            </h4>
+                            <span class="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded">18:00 - 20:00</span>
+                        </div>
+                        <ul class="space-y-2 text-sm text-gray-700">
+                            <li class="flex items-start gap-2">
+                                <span class="text-restaurant-primary">•</span>
+                                <span>Sanduíche natural</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-restaurant-primary">•</span>
+                                <span>Suco de laranja</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quarta-feira - Hoje (Destaque) -->
+            <div class="day-card bg-white rounded-xl shadow-md overflow-hidden fade-in ring-2 ring-restaurant-accent relative" data-day="quarta">
+                <div class="absolute top-2 right-2 bg-restaurant-accent text-white px-3 py-1 rounded-full text-xs font-bold z-10">
+                    HOJE
+                </div>
+                <div class="bg-gradient-to-r from-restaurant-accent to-restaurant-secondary text-white p-4">
+                    <h3 class="font-bold text-lg">Quarta-feira</h3>
+                    <p class="text-sm opacity-90">02 de Outubro</p>
+                </div>
+
+                <div class="meal-section border-b" data-meal="cafe">
+                    <div class="p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="font-semibold text-gray-800 flex items-center gap-2">
+                                <span class="text-2xl">☕</span> Café da Manhã
+                            </h4>
+                            <span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">6:30 - 8:30</span>
+                        </div>
+                        <ul class="space-y-2 text-sm text-gray-700">
+                            <li class="flex items-start gap-2">
+                                <span class="text-restaurant-primary">•</span>
+                                <span>Cuscuz com ovo</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-restaurant-primary">•</span>
+                                <span>Café preto</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="meal-section border-b" data-meal="almoco">
+                    <div class="p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="font-semibold text-gray-800 flex items-center gap-2">
+                                <i class="fas fa-utensils text-green-600"></i> Almoço
+                            </h4>
+                            <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">11:00 - 14:00</span>
+                        </div>
+                        <div class="space-y-3">
+                            <div>
+                                <p class="font-medium text-gray-800">Principal:</p>
+                                <p class="text-sm text-gray-700 ml-4">Peixe Assado com Molho de Maracujá</p>
+                                <div class="flex gap-1 ml-4 mt-1">
+                                    <span class="tag-diet text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full">Light</span>
+                                    <span class="tag-diet text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full">380 kcal</span>
+                                </div>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-800">Vegetariano:</p>
+                                <p class="text-sm text-gray-700 ml-4">Torta de Legumes</p>
+                                <div class="flex gap-1 ml-4 mt-1">
+                                    <span class="tag-diet text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">Sem Lactose</span>
+                                    <span class="tag-diet text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">Sem Glúten</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="meal-section" data-meal="jantar">
+                    <div class="p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="font-semibold text-gray-800 flex items-center gap-2">
+                                <i class="fas fa-moon text-purple-600"></i> Jantar
+                            </h4>
+                            <span class="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded">18:00 - 20:00</span>
+                        </div>
+                        <ul class="space-y-2 text-sm text-gray-700">
+                            <li class="flex items-start gap-2">
+                                <span class="text-restaurant-primary">•</span>
+                                <span>Omelete de queijo</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-restaurant-primary">•</span>
+                                <span>Salada verde</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quinta-feira -->
+            <div class="day-card bg-white rounded-xl shadow-sm overflow-hidden fade-in" data-day="quinta">
+                <div class="bg-gradient-to-r from-restaurant-primary to-restaurant-secondary text-white p-4">
+                    <h3 class="font-bold text-lg">Quinta-feira</h3>
+                    <p class="text-sm opacity-90">03 de Outubro</p>
+                </div>
+
+                <div class="meal-section" data-meal="almoco">
+                    <div class="p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="font-semibold text-gray-800 flex items-center gap-2">
+                                <i class="fas fa-utensils text-green-600"></i> Almoço
+                            </h4>
+                            <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">11:00 - 14:00</span>
+                        </div>
+                        <div class="space-y-3">
+                            <div>
+                                <p class="font-medium text-gray-800">Principal:</p>
+                                <p class="text-sm text-gray-700 ml-4">Strogonoff de Carne</p>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-800">Acompanhamento:</p>
+                                <p class="text-sm text-gray-700 ml-4">Arroz branco, Batata palha</p>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-800">Vegetariano:</p>
+                                <p class="text-sm text-gray-700 ml-4">Almôndegas de Grão de Bico ao Molho</p>
+                                <div class="flex gap-1 ml-4 mt-1">
+                                    <span class="tag-diet text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
+                                        <i class="fas fa-leaf text-xs"></i> Vegetariano
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sexta-feira - Especial -->
+            <div class="day-card bg-white rounded-xl shadow-sm overflow-hidden fade-in border-2 border-restaurant-accent" data-day="sexta">
+                <div class="bg-gradient-to-r from-restaurant-accent to-restaurant-primary text-white p-4">
+                    <h3 class="font-bold text-lg flex items-center gap-2">
+                        Sexta-feira
+                        <span class="bg-white/20 px-2 py-1 rounded text-xs">ESPECIAL</span>
+                    </h3>
+                    <p class="text-sm opacity-90">04 de Outubro</p>
+                </div>
+
+                <div class="meal-section" data-meal="almoco">
+                    <div class="p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="font-semibold text-gray-800 flex items-center gap-2">
+                                <i class="fas fa-utensils text-green-600"></i> Almoço Especial
+                            </h4>
+                            <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">11:00 - 14:00</span>
+                        </div>
+                        <div class="bg-restaurant-light rounded-lg p-3 mb-3">
+                            <p class="font-bold text-restaurant-dark text-lg mb-2">FEIJOADA COMPLETA</p>
+                            <ul class="space-y-1 text-sm text-gray-700">
+                                <li>• Feijoada tradicional</li>
+                                <li>• Arroz branco</li>
+                                <li>• Farofa especial</li>
+                                <li>• Couve refogada</li>
+                                <li>• Laranja</li>
+                                <li>• Torresmo</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <p class="font-medium text-gray-800">Opção Vegetariana:</p>
+                            <p class="text-sm text-gray-700 ml-4">Feijão Preto Temperado com Legumes</p>
+                            <div class="flex gap-1 ml-4 mt-1">
+                                <span class="tag-diet text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">Alérgenos: Soja</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card de Informação -->
+            <div class="bg-gradient-to-br from-restaurant-primary to-restaurant-secondary text-white rounded-xl p-6 flex flex-col justify-center">
+                <h3 class="text-xl font-bold mb-4"><i class="fas fa-chart-pie"></i> Informações Nutricionais</h3>
+                <p class="text-sm mb-4 opacity-90">
+                    Todos os pratos são preparados com ingredientes frescos e seguem as recomendações nutricionais do Programa Nacional de Alimentação.
+                </p>
+                <div class="space-y-2 text-sm">
+                    <div class="flex items-center gap-2">
+                        <span class="bg-white/20 px-2 py-1 rounded text-xs">
+                            <i class="fas fa-check"></i>
+                        </span>
+                        <span>Opções vegetarianas diárias</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="bg-white/20 px-2 py-1 rounded text-xs">
+                            <i class="fas fa-ban"></i>
+                        </span>
+                        <span>Identificação de alérgenos</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="bg-white/20 px-2 py-1 rounded text-xs">
+                            <i class="fas fa-star"></i>
+                        </span>
+                        <span>Pratos light disponíveis</span>
+                    </div>
+                </div>
+                <button onclick="downloadCardapio()" class="mt-4 bg-white text-restaurant-primary py-2 px-4 rounded-lg hover:bg-restaurant-light transition-colors font-medium">
+                    <i class="fas fa-download mr-2"></i> Baixar Cardápio PDF
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal de Informações Nutricionais -->
+    <div id="nutritionalModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl max-w-md w-full p-6 fade-in">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-restaurant-dark">Informações Nutricionais</h3>
+                <button onclick="closeNutritionalModal()" class="text-gray-500 hover:text-gray-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div id="nutritionalContent" class="space-y-3">
+                <!-- Content will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-restaurant-dark text-white py-8 mt-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div>
+                    <div class="flex items-center space-x-2 mb-3">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                            <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                            <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 1 1 0 000 2H6a2 2 0 100 4h2a2 2 0 100-4h-.5a1 1 0 000-2H8a2 2 0 012-2h2a2 2 0 012 2v9a2 2 0 01-2 2H6a2 2 0 01-2-2V5z"/>
+                        </svg>
+                        <h3 class="text-xl font-bold">Le Menu</h3>
+                    </div>
+                    <p class="text-sm text-gray-300">Sistema de Gestão do Restaurante Universitário UNIFESSPA</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-3">Links Rápidos</h4>
+                    <ul class="space-y-2 text-sm text-gray-300">
+                        <li><a href="lemenu-consulta-cardapio.html" class="hover:text-white transition-colors">Cardápio</a></li>
+                        <li><a href="lemenu-avaliar-refeicao.html" class="hover:text-white transition-colors">Avaliar Refeição</a></li>
+                        <li><a href="lemenu-consultar-avaliacoes.html" class="hover:text-white transition-colors">Ver Avaliações</a></li>
+                        <li><a href="lemenu-gestao-avisos.html" class="hover:text-white transition-colors">Avisos</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-3">Contato</h4>
+                    <ul class="space-y-2 text-sm text-gray-300">
+                        <li><i class="fas fa-phone mr-2" aria-hidden="true"></i> (94) 2101-7100</li>
+                        <li><i class="fas fa-envelope mr-2" aria-hidden="true"></i> ru@unifesspa.edu.br</li>
+                        <li><i class="fas fa-clock mr-2" aria-hidden="true"></i> Seg-Sex: 6:30 - 20:00</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-3">Siga-nos</h4>
+                    <div class="flex space-x-3">
+                        <a href="#" class="bg-white/20 hover:bg-white/30 w-10 h-10 rounded-lg flex items-center justify-center transition-colors" aria-label="Facebook">
+                            <i class="fab fa-facebook-f" aria-hidden="true"></i>
+                        </a>
+                        <a href="#" class="bg-white/20 hover:bg-white/30 w-10 h-10 rounded-lg flex items-center justify-center transition-colors" aria-label="Instagram">
+                            <i class="fab fa-instagram" aria-hidden="true"></i>
+                        </a>
+                        <a href="#" class="bg-white/20 hover:bg-white/30 w-10 h-10 rounded-lg flex items-center justify-center transition-colors" aria-label="Twitter">
+                            <i class="fab fa-twitter" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-6 pt-6 text-center text-sm text-gray-400">
+                <p>&copy; 2024 Le Menu - Restaurante Universitário UNIFESSPA. Todos os direitos reservados.</p>
+                <p class="mt-2">Desenvolvido com <i class="fas fa-heart text-red-500" aria-hidden="true"></i> para nossa comunidade acadêmica</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Estado da aplicação
+        let currentWeek = 0;
+        let currentFilter = 'todos';
+
+        // Dados simulados
+        const nutritionalData = {
+            'almoco-segunda': {
+                prato: 'Frango Grelhado',
+                calorias: 430,
+                proteinas: 35,
+                carboidratos: 45,
+                gorduras: 12,
+                fibras: 8,
+                sodio: 450
+            }
+        };
+
+        // Navegação de semanas
+        function changeWeek(direction) {
+            currentWeek += direction;
+            updateWeekDisplay();
+            loadWeekData();
+        }
+
+        function updateWeekDisplay() {
+            const weekRanges = [
+                '30 Set - 04 Out 2024',
+                '07 Out - 11 Out 2024',
+                '14 Out - 18 Out 2024'
+            ];
+            const range = weekRanges[currentWeek + 1] || weekRanges[1];
+            document.getElementById('weekRange').textContent = range;
+        }
+
+        // Filtros
+        function filterByMealType() {
+            const filter = document.getElementById('filterMeal').value;
+            currentFilter = filter;
+            applyFilter();
+        }
+
+        function setMealFilter(filter) {
+            currentFilter = filter;
+            document.getElementById('filterMeal').value = filter;
+
+            // Update mobile tabs
+            document.querySelectorAll('.meal-tab').forEach(tab => {
+                tab.classList.remove('meal-type-active');
+                tab.classList.add('bg-gray-100');
+            });
+            event.target.classList.add('meal-type-active');
+            event.target.classList.remove('bg-gray-100');
+
+            applyFilter();
+        }
+
+        function applyFilter() {
+            const mealSections = document.querySelectorAll('.meal-section');
+
+            mealSections.forEach(section => {
+                if (currentFilter === 'todos') {
+                    section.style.display = 'block';
+                } else {
+                    if (section.dataset.meal === currentFilter) {
+                        section.style.display = 'block';
+                    } else {
+                        section.style.display = 'none';
+                    }
+                }
+            });
+        }
+
+        // Modal de informações nutricionais
+        function showNutritionalInfo(mealId) {
+            const modal = document.getElementById('nutritionalModal');
+            const content = document.getElementById('nutritionalContent');
+            const data = nutritionalData[mealId];
+
+            if (data) {
+                content.innerHTML = `
+                    <h4 class="font-semibold text-gray-800 mb-3">${data.prato}</h4>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-gray-50 rounded-lg p-3">
+                            <p class="text-xs text-gray-500">Calorias</p>
+                            <p class="text-lg font-bold text-restaurant-primary">${data.calorias} kcal</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-3">
+                            <p class="text-xs text-gray-500">Proteínas</p>
+                            <p class="text-lg font-bold text-restaurant-green">${data.proteinas}g</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-3">
+                            <p class="text-xs text-gray-500">Carboidratos</p>
+                            <p class="text-lg font-bold text-restaurant-secondary">${data.carboidratos}g</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-3">
+                            <p class="text-xs text-gray-500">Gorduras</p>
+                            <p class="text-lg font-bold text-yellow-600">${data.gorduras}g</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-3">
+                            <p class="text-xs text-gray-500">Fibras</p>
+                            <p class="text-lg font-bold text-green-600">${data.fibras}g</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-3">
+                            <p class="text-xs text-gray-500">Sódio</p>
+                            <p class="text-lg font-bold text-gray-600">${data.sodio}mg</p>
+                        </div>
+                    </div>
+                    <div class="mt-4 p-3 bg-restaurant-light rounded-lg">
+                        <p class="text-xs text-gray-600">
+                            * Valores baseados em uma porção média de 300g
+                        </p>
+                    </div>
+                `;
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeNutritionalModal() {
+            document.getElementById('nutritionalModal').classList.add('hidden');
+        }
+
+        // Ações
+        function avaliarRefeicao(mealType) {
+            // Redireciona para a página de avaliação, pré-selecionando a refeição
+            const url = `lemenu-avaliar-refeicao.html?meal=${encodeURIComponent(mealType)}`;
+            window.location.href = url;
+        }
+
+        function downloadCardapio() {
+            alert('Baixando cardápio em PDF...');
+            // Implementar download do PDF
+        }
+
+        function loadWeekData() {
+            // Simular carregamento de dados da semana
+            console.log('Carregando dados da semana', currentWeek);
+        }
+
+        // Toggle mobile menu
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            const button = document.getElementById('mobile-menu-button');
+            const isExpanded = button.getAttribute('aria-expanded') === 'true';
+
+            mobileMenu.classList.toggle('hidden');
+            button.setAttribute('aria-expanded', !isExpanded);
+
+            // Update button icon
+            const icon = button.querySelector('svg');
+            if (isExpanded) {
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>';
+                button.setAttribute('aria-label', 'Abrir menu de navegação');
+            } else {
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>';
+                button.setAttribute('aria-label', 'Fechar menu de navegação');
+            }
+        }
+
+        function handleLogout() {
+            if (confirm('Deseja sair do sistema?')) {
+                try { localStorage.clear(); } catch (e) {}
+                alert('Logout realizado com sucesso!');
+                window.location.reload();
+            }
+        }
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', () => {
+            // Adicionar animação de entrada aos cards
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('fade-in');
+                    }
+                });
+            });
+
+            document.querySelectorAll('.day-card').forEach(card => {
+                observer.observe(card);
+            });
+
+            // Favoritos (estrela) por prato
+            const FAVORITES_KEY = 'lemenu_favorites';
+            const loadFavs = () => {
+                try { return JSON.parse(localStorage.getItem(FAVORITES_KEY)) || {}; } catch (e) { return {}; }
+            };
+            const saveFavs = (obj) => {
+                try { localStorage.setItem(FAVORITES_KEY, JSON.stringify(obj)); } catch (e) {}
+            };
+
+            const favs = loadFavs();
+            const counters = {};
+
+            document.querySelectorAll('.day-card').forEach(card => {
+                const day = card.getAttribute('data-day') || 'dia';
+                card.querySelectorAll('.meal-section').forEach(section => {
+                    const meal = section.getAttribute('data-meal') || 'refeicao';
+                    const key = `${day}-${meal}`;
+                    counters[key] = 0;
+
+                    section.querySelectorAll('p.text-sm.text-gray-700.ml-4').forEach(p => {
+                        const idx = ++counters[key];
+                        const favId = `${day}-${meal}-${idx}`;
+                        const isFav = !!favs[favId];
+
+                        const btn = document.createElement('button');
+                        btn.type = 'button';
+                        btn.className = 'inline-flex items-center justify-center ml-2 align-middle';
+                        btn.setAttribute('data-fav-id', favId);
+                        btn.setAttribute('aria-pressed', isFav ? 'true' : 'false');
+                        btn.setAttribute('aria-label', isFav ? 'Remover dos favoritos' : 'Adicionar aos favoritos');
+
+                        const icon = document.createElement('i');
+                        icon.setAttribute('aria-hidden', 'true');
+                        icon.className = (isFav ? 'fas' : 'far') + ' fa-heart ' + (isFav ? 'text-red-500' : 'text-gray-400 hover:text-red-500');
+                        btn.appendChild(icon);
+
+                        btn.addEventListener('click', () => {
+                            const pressed = btn.getAttribute('aria-pressed') === 'true';
+                            const next = !pressed;
+                            btn.setAttribute('aria-pressed', next ? 'true' : 'false');
+                            btn.setAttribute('aria-label', next ? 'Remover dos favoritos' : 'Adicionar aos favoritos');
+
+                            icon.classList.remove('fas', 'far', 'text-red-500', 'text-gray-400');
+                            if (next) {
+                                icon.classList.add('fas', 'fa-heart', 'text-red-500');
+                            } else {
+                                icon.classList.add('far', 'fa-heart', 'text-gray-400');
+                            }
+
+                            const current = loadFavs();
+                            if (next) { current[favId] = true; } else { delete current[favId]; }
+                            saveFavs(current);
+                        });
+
+                        // Inserir botão ao lado do nome do prato
+                        p.appendChild(btn);
+
+
+
+                    });
+                });
+
+            // Avaliações: média por refeição + botão "Avaliar" em cada seção
+            (function enhanceEvaluations() {
+                const EVALS_KEY = 'lemenu_evaluations';
+                const loadEvals = () => {
+                    try { return JSON.parse(localStorage.getItem(EVALS_KEY)) || []; } catch (e) { return []; }
+                };
+
+                const evals = loadEvals();
+                const stats = evals.reduce((acc, e) => {
+                    if (!e || typeof e.mealType !== 'string') return acc;
+                    const key = e.mealType;
+                    if (!acc[key]) acc[key] = { sum: 0, count: 0 };
+                    acc[key].sum += Number(e.rating || 0);
+                    acc[key].count += 1;
+                    return acc;
+                }, {});
+
+                document.querySelectorAll('.day-card').forEach(card => {
+                    card.querySelectorAll('.meal-section').forEach(section => {
+                        const mealType = section.getAttribute('data-meal');
+                        const container = section.querySelector('.p-4') || section;
+
+
+                    });
+                });
+
+
+                // Exibir média por prato ao lado do nome (protótipo)
+                (function showDishAverages(){
+                    const EVALS_KEY = 'lemenu_evaluations';
+                    let evals = [];
+                    try { evals = JSON.parse(localStorage.getItem(EVALS_KEY)) || []; } catch(e) { evals = []; }
+                    const dishStats = {};
+                    evals.forEach(e => {
+                        (e.dishes || []).forEach(d => {
+                            const name = String(d.name || '').trim().toLowerCase();
+                            if (!name) return;
+                            if (!dishStats[name]) dishStats[name] = { sum: 0, count: 0 };
+                            dishStats[name].sum += Number(d.rating || 0);
+                            dishStats[name].count += 1;
+                        });
+                    });
+                    document.querySelectorAll('p.text-sm.text-gray-700.ml-4').forEach(p => {
+                        if (p.querySelector('.dish-star-group')) return;
+                        const first = p.childNodes[0];
+                        const name = ((first && first.nodeType === 3) ? first.nodeValue : p.textContent).trim().toLowerCase();
+                        const st = dishStats[name];
+                        const avg = st ? (st.sum / st.count) : 0;
+                        const rounded = Math.round(avg);
+                        const group = document.createElement('span');
+                        group.className = 'dish-star-group ml-2 inline-flex items-center gap-0.5 text-xs';
+                        if (st) group.setAttribute('title', `Média ${avg.toFixed(1)}`);
+                        const firstOriginal = p.childNodes[0];
+                        const dishNameOriginal = ((firstOriginal && firstOriginal.nodeType === 3) ? firstOriginal.nodeValue : p.textContent).trim();
+                        const meal = (p.closest('.meal-section')?.getAttribute('data-meal')) || 'refeicao';
+                        const day = (p.closest('.day-card')?.getAttribute('data-day')) || 'dia';
+                        for (let i = 1; i <= 5; i++) {
+                            const icon = document.createElement('i');
+                            icon.className = (i <= rounded ? 'fas' : 'far') + ' fa-star ' + (i <= rounded ? 'text-yellow-500' : 'text-gray-300');
+                            icon.style.cursor = 'pointer';
+                            icon.setAttribute('aria-label', `Avaliar ${i} estrelas`);
+                            icon.addEventListener('click', () => {
+                                openDishEvalModal(dishNameOriginal, day, meal);
+                                setTimeout(() => setDishModalRating(i), 0);
+                            });
+                            group.appendChild(icon);
+                        }
+                        p.appendChild(group);
+
+                    });
+                })();
+
+                // Alerta de sucesso pós-avaliação
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.get('rated') === '1') {
+                    setTimeout(() => alert('Avaliação enviada com sucesso!'), 150);
+                    urlParams.delete('rated');
+
+
+                    const qs = urlParams.toString();
+                    history.replaceState({}, '', window.location.pathname + (qs ? '?' + qs : ''));
+                }
+            })();
+
+            });
+
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', (e) => {
+                const mobileMenu = document.getElementById('mobile-menu');
+                const button = document.getElementById('mobile-menu-button');
+
+                if (!button.contains(e.target) && !mobileMenu.contains(e.target)) {
+                    mobileMenu.classList.add('hidden');
+                    button.setAttribute('aria-expanded', 'false');
+                    button.setAttribute('aria-label', 'Abrir menu de navegação');
+                    const icon = button.querySelector('svg');
+                    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>';
+                }
+            });
+        });
+    </script>
+
+<!-- Modal: Avaliar prato -->
+<div id="dish-eval-modal" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true" aria-labelledby="dishEvalTitle">
+  <div class="absolute inset-0 bg-black/40" onclick="closeDishEvalModal()"></div>
+  <div class="relative mx-auto my-12 w-11/12 max-w-md bg-white rounded-xl shadow-lg p-6">
+    <div class="flex items-start justify-between mb-4">
+      <div>
+        <h3 id="dishEvalTitle" class="text-lg font-semibold text-gray-800">Avaliar prato</h3>
+        <p id="dishEvalSub" class="text-sm text-gray-500"></p>
+      </div>
+      <button type="button" class="text-gray-400 hover:text-gray-600" aria-label="Fechar" onclick="closeDishEvalModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="mb-4">
+      <label class="block text-sm font-medium text-gray-700 mb-2">Sua nota</label>
+      <div id="dishEvalStars" class="flex gap-1 text-xl">
+        <i class="fas fa-star text-gray-300 cursor-pointer" onclick="setDishModalRating(1)"></i>
+        <i class="fas fa-star text-gray-300 cursor-pointer" onclick="setDishModalRating(2)"></i>
+        <i class="fas fa-star text-gray-300 cursor-pointer" onclick="setDishModalRating(3)"></i>
+        <i class="fas fa-star text-gray-300 cursor-pointer" onclick="setDishModalRating(4)"></i>
+        <i class="fas fa-star text-gray-300 cursor-pointer" onclick="setDishModalRating(5)"></i>
+      </div>
+    </div>
+    <div class="mb-6">
+      <label class="block text-sm font-medium text-gray-700 mb-2">Comentário (opcional)</label>
+      <textarea id="dishEvalComment" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-restaurant-primary focus:border-transparent" placeholder="Escreva um comentário..."></textarea>
+    </div>
+    <div class="flex justify-end gap-2">
+      <button type="button" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg" onclick="closeDishEvalModal()">Cancelar</button>
+      <button type="button" class="px-4 py-2 bg-restaurant-primary hover:bg-restaurant-dark text-white rounded-lg" onclick="saveDishEvaluation()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Estado do modal
+  let dishModalState = { name: '', day: '', meal: '', rating: 0 };
+  function openDishEvalModal(name, day, meal) {
+    dishModalState = { name, day, meal, rating: 0 };
+    document.getElementById('dishEvalTitle').textContent = `Avaliar: ${name}`;
+    document.getElementById('dishEvalSub').textContent = `${day} • ${meal.charAt(0).toUpperCase() + meal.slice(1)}`;
+    document.getElementById('dishEvalComment').value = '';
+    // reset estrelas
+    Array.from(document.querySelectorAll('#dishEvalStars .fa-star')).forEach(el => el.classList.remove('text-yellow-500'));
+    Array.from(document.querySelectorAll('#dishEvalStars .fa-star')).forEach(el => el.classList.add('text-gray-300'));
+    document.getElementById('dish-eval-modal').classList.remove('hidden');
+  }
+  function closeDishEvalModal() {
+    document.getElementById('dish-eval-modal').classList.add('hidden');
+  }
+  function setDishModalRating(n) {
+    dishModalState.rating = n;
+    const stars = document.querySelectorAll('#dishEvalStars .fa-star');
+    stars.forEach((s, i) => {
+      s.classList.remove('text-yellow-500', 'text-gray-300');
+      s.classList.add(i < n ? 'text-yellow-500' : 'text-gray-300');
+    });
+  }
+  function saveDishEvaluation() {
+    if (!dishModalState.name || dishModalState.rating <= 0) { alert('Selecione uma nota.'); return; }
+    const EVALS_KEY = 'lemenu_evaluations';
+    let list = [];
+    try { list = JSON.parse(localStorage.getItem(EVALS_KEY)) || []; } catch (e) { list = []; }
+    list.push({
+      mealType: dishModalState.meal || 'refeicao',
+      rating: dishModalState.rating,
+      comment: document.getElementById('dishEvalComment').value || '',
+      dishes: [{ name: dishModalState.name, rating: dishModalState.rating }],
+      day: dishModalState.day,
+      date: new Date().toISOString()
+    });
+    try { localStorage.setItem(EVALS_KEY, JSON.stringify(list)); } catch (e) {}
+    closeDishEvalModal();
+    window.location.reload();
+  }
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDishEvalModal(); });
+</script>
+
+</body>
+</html>

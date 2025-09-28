@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Le Menu - Cadastro de Cardápio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'roboto': ['Roboto', 'sans-serif'],
+                    },
+                    colors: {
+                        'restaurant': {
+                            'primary': '#8B4513',
+                            'secondary': '#D2691E',
+                            'accent': '#FF6B35',
+                            'light': '#FFF5E6',
+                            'green': '#4A7C59',
+                            'dark': '#3E2723'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .tag-badge {
+            transition: all 0.2s ease;
+        }
+        .tag-badge:hover {
+            transform: scale(1.05);
+        }
+        .preview-image {
+            transition: all 0.3s ease;
+        }
+        .preview-image:hover {
+            transform: scale(1.02);
+        }
+    </style>
+</head>
+<body class="bg-restaurant-light">
+    <!-- Header -->
+    <header class="bg-white shadow-md sticky top-0 z-50" role="banner">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <a href="index.html" class="flex items-center space-x-2" aria-label="Página inicial">
+                    <svg class="w-8 h-8 text-restaurant-primary" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                        <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                        <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 1 1 0 000 2H6a2 2 0 100 4h2a2 2 0 100-4h-.5a1 1 0 000-2H8a2 2 0 012-2h2a2 2 0 012 2v9a2 2 0 01-2 2H6a2 2 0 01-2-2V5z"/>
+                    </svg>
+                    <h1 class="text-xl md:text-2xl font-bold text-restaurant-dark">Le Menu</h1>
+                </a>
+                <nav class="hidden md:flex items-center space-x-6" role="navigation" aria-label="Menu principal">
+                    <a href="lemenu-consulta-cardapio.html" class="text-restaurant-primary font-medium" aria-current="page" id="nav-cardapio">Cardápio</a>
+                    <a href="lemenu-gestao-avisos.html" class="text-gray-600 hover:text-restaurant-primary transition-colors" id="nav-avisos">Avisos</a>
+                    <a href="lemenu-consultar-avaliacoes.html" class="text-gray-600 hover:text-restaurant-primary transition-colors" id="nav-avaliacoes">Avaliações</a>
+                </nav>
+                <!-- Mobile menu button -->
+                <button class="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                        onclick="toggleMobileMenu()"
+                        aria-label="Abrir menu de navegação"
+                        aria-expanded="false"
+                        aria-controls="mobile-menu"
+                        id="mobile-menu-button">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+                <div class="hidden md:flex items-center space-x-3">
+                    <span class="text-sm text-gray-600">Gestor: Maria Silva</span>
+                    <button onclick="handleLogout()" class="text-restaurant-primary hover:text-restaurant-dark transition-colors" aria-label="Sair do sistema">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <!-- Mobile Navigation Menu -->
+            <div class="md:hidden hidden mt-4 pb-4 border-t" id="mobile-menu" role="navigation" aria-label="Menu de navegação móvel">
+                <div class="flex flex-col space-y-2 mt-4">
+                    <a href="lemenu-consulta-cardapio.html" class="block py-2 px-4 text-restaurant-primary font-medium rounded-lg bg-restaurant-light" aria-current="page">Cardápio</a>
+                    <a href="lemenu-gestao-avisos.html" class="block py-2 px-4 text-gray-600 hover:text-restaurant-primary hover:bg-gray-50 rounded-lg transition-colors">Avisos</a>
+                    <a href="lemenu-consultar-avaliacoes.html" class="block py-2 px-4 text-gray-600 hover:text-restaurant-primary hover:bg-gray-50 rounded-lg transition-colors">Avaliações</a>
+                    <div class="mt-2 pt-2 border-t border-gray-200">
+                        <span class="block py-2 px-4 text-sm text-gray-600">Gestor: Maria Silva</span>
+                        <button onclick="handleLogout()" class="w-full text-left py-2 px-4 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                            </svg>Sair
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navegação Breadcrumb -->
+    <nav class="bg-white border-b" aria-label="Breadcrumb">
+        <div class="container mx-auto px-4 py-2">
+            <ol class="flex items-center space-x-2 text-sm">
+                <li>
+                    <a href="index.html" class="text-gray-500 hover:text-restaurant-primary transition-colors">
+                        <i class="fas fa-home" aria-hidden="true"></i>
+                        <span class="sr-only">Início</span>
+                    </a>
+                </li>
+                <li>
+                    <span class="text-gray-400 mx-2">/</span>
+                </li>
+                <li>
+                    <a href="lemenu-consulta-cardapio.html" class="text-gray-500 hover:text-restaurant-primary transition-colors">Cardápio</a>
+                </li>
+                <li>
+                    <span class="text-gray-400 mx-2">/</span>
+                </li>
+                <li>
+                    <span class="text-restaurant-primary font-medium" aria-current="page">Cadastro</span>
+                </li>
+            </ol>
+        </div>
+    </nav>
+    <main role="main">
+
+    <!-- Formulário de Cadastro -->
+    <div class="container mx-auto px-4 py-6">
+        <!-- Título e Status -->
+        <div class="bg-white rounded-xl shadow-sm p-4 mb-6 fade-in">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                <h2 class="text-2xl font-bold text-restaurant-dark mb-2 sm:mb-0">Cadastro de Cardápio</h2>
+                <div class="flex items-center space-x-2">
+                    <span class="text-sm text-gray-600">Status:</span>
+                    <span id="saveStatus" class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium">
+                        Não salvo
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <form id="cardapioForm" class="space-y-6">
+            <!-- Seção 1: Data e Tipo de Refeição -->
+            <div class="bg-white rounded-xl shadow-sm p-4 sm:p-6 fade-in">
+                <h3 class="text-lg font-semibold text-restaurant-dark mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-restaurant-primary" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"/>
+                    </svg>
+                    Informações Básicas
+                </h3>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <!-- Data -->
+                    <div>
+                        <label for="dataCardapio" class="block text-sm font-medium text-gray-700 mb-2">Data do Cardápio *</label>
+                        <input type="date"
+                               id="dataCardapio"
+                               name="dataCardapio"
+                               required
+                               aria-label="Selecionar data do cardápio"
+                               aria-describedby="dataCardapio-hint"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-restaurant-primary focus:border-transparent transition-all">
+                        <p id="dataCardapio-hint" class="text-xs text-gray-500 mt-1">Escolha a data para qual o cardápio será publicado</p>
+                    </div>
+
+                    <!-- Tipo de Refeição -->
+                    <div>
+                        <label for="tipoRefeicao" class="block text-sm font-medium text-gray-700 mb-2">Tipo de Refeição *</label>
+                        <select id="tipoRefeicao"
+                                name="tipoRefeicao"
+                                required
+                                aria-label="Selecionar tipo de refeição"
+                                aria-describedby="tipoRefeicao-hint"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-restaurant-primary focus:border-transparent transition-all">
+                            <option value="">Selecione...</option>
+                            <option value="cafe">Café da Manhã</option>
+                            <option value="almoco">Almoço</option>
+                            <option value="lanche">Lanche da Tarde</option>
+                            <option value="jantar">Jantar</option>
+                        </select>
+                        <p id="tipoRefeicao-hint" class="text-xs text-gray-500 mt-1">Selecione o tipo de refeição que está sendo cadastrada</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seção 2: Dados do Prato -->
+            <div class="bg-white rounded-xl shadow-sm p-4 sm:p-6 fade-in">
+                <h3 class="text-lg font-semibold text-restaurant-dark mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-restaurant-primary" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                        <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 1 1 0 000 2H6a2 2 0 100 4h2a2 2 0 100-4h-.5a1 1 0 000-2H8a2 2 0 012-2h2a2 2 0 012 2v9a2 2 0 01-2 2H6a2 2 0 01-2-2V5z"/>
+                    </svg>
+                    Informações do Prato
+                </h3>
+
+                <!-- Tipo de Prato -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Tipo de Prato *</label>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+                        <button type="button" onclick="selectTipoPrato('principal')"
+                                class="tipo-prato-btn px-4 py-2 border-2 border-gray-300 rounded-lg text-sm font-medium hover:border-restaurant-primary transition-all"
+                                data-tipo="principal">
+                            Prato Principal
+                        </button>
+                        <button type="button" onclick="selectTipoPrato('acompanhamento')"
+                                class="tipo-prato-btn px-4 py-2 border-2 border-gray-300 rounded-lg text-sm font-medium hover:border-restaurant-primary transition-all"
+                                data-tipo="acompanhamento">
+                            Acompanhamento
+                        </button>
+                        <button type="button" onclick="selectTipoPrato('guarnicao')"
+                                class="tipo-prato-btn px-4 py-2 border-2 border-gray-300 rounded-lg text-sm font-medium hover:border-restaurant-primary transition-all"
+                                data-tipo="guarnicao">
+                            Guarnição
+                        </button>
+                        <button type="button" onclick="selectTipoPrato('salada')"
+                                class="tipo-prato-btn px-4 py-2 border-2 border-gray-300 rounded-lg text-sm font-medium hover:border-restaurant-primary transition-all"
+                                data-tipo="salada">
+                            Salada
+                        </button>
+                        <button type="button" onclick="selectTipoPrato('sobremesa')"
+                                class="tipo-prato-btn px-4 py-2 border-2 border-gray-300 rounded-lg text-sm font-medium hover:border-restaurant-primary transition-all"
+                                data-tipo="sobremesa">
+                            Sobremesa
+                        </button>
+                    </div>
+                    <input type="hidden" id="tipoPrato" required>
+                </div>
+
+                <!-- Nome e Descrição -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Nome do Prato *</label>
+                        <input type="text" id="nomePrato" required placeholder="Ex: Frango Grelhado"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-restaurant-primary focus:border-transparent transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Descrição</label>
+                        <input type="text" id="descricaoPrato" placeholder="Ex: Temperado com ervas finas"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-restaurant-primary focus:border-transparent transition-all">
+                    </div>
+                </div>
+
+                <!-- Tags Dietéticas -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Tags Dietéticas</label>
+                    <div class="flex flex-wrap gap-2 mb-2">
+                        <button type="button" onclick="toggleTag(this, 'vegetariano')"
+                                class="tag-btn px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium hover:bg-green-100 hover:text-green-700 transition-all flex items-center gap-1">
+                            <span class="text-green-600">✓</span>
+                            Vegetariano
+                        </button>
+                        <button type="button" onclick="toggleTag(this, 'vegano')"
+                                class="tag-btn px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium hover:bg-green-100 hover:text-green-700 transition-all flex items-center gap-1">
+                            <span class="text-green-600">✓✓</span>
+                            Vegano
+                        </button>
+                        <button type="button" onclick="toggleTag(this, 'sem-gluten')"
+                                class="tag-btn px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium hover:bg-blue-100 hover:text-blue-700 transition-all flex items-center gap-1">
+                            <span class="text-blue-600">⊘</span>
+                            Sem Glúten
+                        </button>
+                        <button type="button" onclick="toggleTag(this, 'sem-lactose')"
+                                class="tag-btn px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium hover:bg-blue-100 hover:text-blue-700 transition-all flex items-center gap-1">
+                            <span class="text-blue-600">⊘</span>
+                            Sem Lactose
+                        </button>
+                        <button type="button" onclick="toggleTag(this, 'integral')"
+                                class="tag-btn px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium hover:bg-orange-100 hover:text-orange-700 transition-all flex items-center gap-1">
+                            <span class="text-orange-600">◉</span>
+                            Integral
+                        </button>
+                        <button type="button" onclick="toggleTag(this, 'light')"
+                                class="tag-btn px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium hover:bg-yellow-100 hover:text-yellow-700 transition-all flex items-center gap-1">
+                            <span class="text-yellow-600">★</span>
+                            Light
+                        </button>
+                    </div>
+                    <input type="hidden" id="tags" value="">
+                </div>
+
+                <!-- Upload de Foto -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Foto do Prato</label>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <div class="flex-1">
+                            <label for="fotoPrato" class="block w-full cursor-pointer">
+                                <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-restaurant-primary transition-all">
+                                    <svg class="w-8 h-8 mx-auto text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                                    </svg>
+                                    <p class="text-sm text-gray-600">Clique para enviar ou arraste a imagem</p>
+                                    <p class="text-xs text-gray-400 mt-1">JPG, PNG até 5MB</p>
+                                </div>
+                                <input type="file" id="fotoPrato" accept="image/*" class="hidden" onchange="previewImage(event)">
+                            </label>
+                        </div>
+                        <div id="imagePreview" class="hidden">
+                            <img id="preview" class="w-32 h-32 object-cover rounded-lg preview-image" alt="Preview">
+                            <button type="button" onclick="removeImage()" class="mt-2 text-sm text-red-600 hover:text-red-800">
+                                Remover
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seção 3: Informações Nutricionais (Opcional) -->
+            <div class="bg-white rounded-xl shadow-sm p-4 sm:p-6 fade-in">
+                <h3 class="text-lg font-semibold text-restaurant-dark mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-restaurant-primary" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"/>
+                        <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"/>
+                    </svg>
+                    Informações Nutricionais (Opcional)
+                </h3>
+
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Calorias</label>
+                        <div class="relative">
+                            <input type="number" id="calorias" placeholder="0"
+                                   class="w-full px-4 py-2 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-restaurant-primary focus:border-transparent transition-all">
+                            <span class="absolute right-3 top-2.5 text-gray-500 text-sm">kcal</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Proteínas</label>
+                        <div class="relative">
+                            <input type="number" id="proteinas" placeholder="0" step="0.1"
+                                   class="w-full px-4 py-2 pr-8 border border-gray-300 rounded-lg focus:ring-2 focus:ring-restaurant-primary focus:border-transparent transition-all">
+                            <span class="absolute right-3 top-2.5 text-gray-500 text-sm">g</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Carboidratos</label>
+                        <div class="relative">
+                            <input type="number" id="carboidratos" placeholder="0" step="0.1"
+                                   class="w-full px-4 py-2 pr-8 border border-gray-300 rounded-lg focus:ring-2 focus:ring-restaurant-primary focus:border-transparent transition-all">
+                            <span class="absolute right-3 top-2.5 text-gray-500 text-sm">g</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Gorduras</label>
+                        <div class="relative">
+                            <input type="number" id="gorduras" placeholder="0" step="0.1"
+                                   class="w-full px-4 py-2 pr-8 border border-gray-300 rounded-lg focus:ring-2 focus:ring-restaurant-primary focus:border-transparent transition-all">
+                            <span class="absolute right-3 top-2.5 text-gray-500 text-sm">g</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botões de Ação -->
+            <div class="flex flex-col sm:flex-row gap-3 justify-end">
+                <button type="button" onclick="saveDraft()"
+                        class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-all">
+                    Salvar como Rascunho
+                </button>
+                <button type="button" onclick="addAnother()"
+                        class="px-6 py-2 bg-restaurant-secondary text-white rounded-lg font-medium hover:bg-restaurant-dark transition-all">
+                    Adicionar Outro Prato
+                </button>
+                <button type="submit"
+                        class="px-6 py-2 bg-restaurant-primary text-white rounded-lg font-medium hover:bg-restaurant-dark transition-all">
+                    Publicar Cardápio
+                </button>
+            </div>
+        </form>
+
+        <!-- Lista de Pratos Adicionados -->
+        <div id="pratosAdicionados" class="mt-6 hidden">
+            <h3 class="text-lg font-semibold text-restaurant-dark mb-4">Pratos Adicionados Hoje</h3>
+            <div id="listaPratos" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Pratos serão adicionados dinamicamente aqui -->
+            </div>
+        </div>
+    </div>
+    </main>
+
+    <!-- Toast de Notificação -->
+    <div id="toast" class="fixed bottom-4 right-4 hidden z-50" role="status" aria-live="polite" aria-atomic="true">
+        <div class="bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg flex items-center space-x-3 fade-in">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
+            </svg>
+            <span id="toastMessage">Prato adicionado com sucesso!</span>
+        </div>
+    </div>
+
+    <script>
+        // Estado da aplicação
+        let selectedTipoPrato = '';
+        let selectedTags = [];
+        let pratosCardapio = JSON.parse(localStorage.getItem('pratosCardapio') || '[]');
+        let imageData = null;
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', () => {
+            // Definir data de hoje como padrão
+            const hoje = new Date().toISOString().split('T')[0];
+            document.getElementById('dataCardapio').value = hoje;
+
+            // Carregar pratos salvos
+            loadSavedPratos();
+
+            // Adicionar listener ao formulário
+            document.getElementById('cardapioForm').addEventListener('submit', handleSubmit);
+        });
+
+        // Selecionar tipo de prato
+        function selectTipoPrato(tipo) {
+            // Remover seleção anterior
+            document.querySelectorAll('.tipo-prato-btn').forEach(btn => {
+                btn.classList.remove('border-restaurant-primary', 'bg-restaurant-primary', 'text-white');
+                btn.classList.add('border-gray-300');
+            });
+
+            // Adicionar seleção ao botão clicado
+            const selectedBtn = document.querySelector(`[data-tipo="${tipo}"]`);
+            selectedBtn.classList.remove('border-gray-300');
+            selectedBtn.classList.add('border-restaurant-primary', 'bg-restaurant-primary', 'text-white');
+
+            selectedTipoPrato = tipo;
+            document.getElementById('tipoPrato').value = tipo;
+        }
+
+        // Toggle de tags
+        function toggleTag(button, tag) {
+            button.classList.toggle('bg-green-100');
+            button.classList.toggle('text-green-700');
+            button.classList.toggle('bg-gray-100');
+            button.classList.toggle('text-gray-700');
+
+            const index = selectedTags.indexOf(tag);
+            if (index > -1) {
+                selectedTags.splice(index, 1);
+            } else {
+                selectedTags.push(tag);
+            }
+
+            document.getElementById('tags').value = selectedTags.join(',');
+        }
+
+        // Preview de imagem
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (file && file.size <= 5 * 1024 * 1024) { // 5MB limit
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imageData = e.target.result;
+                    document.getElementById('preview').src = imageData;
+                    document.getElementById('imagePreview').classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            } else {
+                showToast('Imagem muito grande! Máximo 5MB.', 'error');
+            }
+        }
+
+        // Remover imagem
+        function removeImage() {
+            imageData = null;
+            document.getElementById('fotoPrato').value = '';
+            document.getElementById('imagePreview').classList.add('hidden');
+        }
+
+        // Adicionar outro prato
+        function addAnother() {
+            if (validateForm()) {
+                const prato = collectFormData();
+                pratosCardapio.push(prato);
+                localStorage.setItem('pratosCardapio', JSON.stringify(pratosCardapio));
+
+                showToast('Prato adicionado! Continue adicionando ou publique o cardápio.');
+                resetForm();
+                loadSavedPratos();
+                updateStatus('Rascunho salvo');
+            }
+        }
+
+        // Salvar como rascunho
+        function saveDraft() {
+            if (validateForm()) {
+                const prato = collectFormData();
+                pratosCardapio.push(prato);
+                localStorage.setItem('pratosCardapio', JSON.stringify(pratosCardapio));
+
+                showToast('Cardápio salvo como rascunho!');
+                updateStatus('Rascunho salvo');
+                loadSavedPratos();
+            }
+        }
+
+        // Submeter formulário
+        function handleSubmit(e) {
+            e.preventDefault();
+
+            if (validateForm()) {
+                const prato = collectFormData();
+                pratosCardapio.push(prato);
+
+                // Simular publicação
+                const cardapioCompleto = {
+                    data: document.getElementById('dataCardapio').value,
+                    pratos: pratosCardapio,
+                    publicadoEm: new Date().toISOString(),
+                    status: 'publicado'
+                };
+
+                localStorage.setItem('cardapioPublicado', JSON.stringify(cardapioCompleto));
+                localStorage.removeItem('pratosCardapio');
+
+                showToast('Cardápio publicado com sucesso!', 'success');
+                updateStatus('Publicado');
+
+                // Simular redirecionamento após 2 segundos
+                setTimeout(() => {
+                    alert('Redirecionando para a página de cardápios...');
+                    window.location.reload();
+                }, 2000);
+            }
+        }
+
+        // Validar formulário
+        function validateForm() {
+            const data = document.getElementById('dataCardapio').value;
+            const tipoRefeicao = document.getElementById('tipoRefeicao').value;
+            const nomePrato = document.getElementById('nomePrato').value;
+
+            if (!data || !tipoRefeicao || !selectedTipoPrato || !nomePrato) {
+                showToast('Por favor, preencha todos os campos obrigatórios!', 'error');
+                return false;
+            }
+
+            return true;
+        }
+
+        // Coletar dados do formulário
+        function collectFormData() {
+            return {
+                id: Date.now(),
+                data: document.getElementById('dataCardapio').value,
+                tipoRefeicao: document.getElementById('tipoRefeicao').value,
+                tipoPrato: selectedTipoPrato,
+                nome: document.getElementById('nomePrato').value,
+                descricao: document.getElementById('descricaoPrato').value,
+                tags: selectedTags,
+                imagem: imageData,
+                nutricional: {
+                    calorias: document.getElementById('calorias').value || 0,
+                    proteinas: document.getElementById('proteinas').value || 0,
+                    carboidratos: document.getElementById('carboidratos').value || 0,
+                    gorduras: document.getElementById('gorduras').value || 0
+                }
+            };
+        }
+
+        // Resetar formulário
+        function resetForm() {
+            document.getElementById('nomePrato').value = '';
+            document.getElementById('descricaoPrato').value = '';
+            document.getElementById('calorias').value = '';
+            document.getElementById('proteinas').value = '';
+            document.getElementById('carboidratos').value = '';
+            document.getElementById('gorduras').value = '';
+
+            selectedTipoPrato = '';
+            selectedTags = [];
+            imageData = null;
+
+            document.querySelectorAll('.tipo-prato-btn').forEach(btn => {
+                btn.classList.remove('border-restaurant-primary', 'bg-restaurant-primary', 'text-white');
+                btn.classList.add('border-gray-300');
+            });
+
+            document.querySelectorAll('.tag-btn').forEach(btn => {
+                btn.classList.remove('bg-green-100', 'text-green-700');
+                btn.classList.add('bg-gray-100', 'text-gray-700');
+            });
+
+            removeImage();
+        }
+
+        // Carregar pratos salvos
+        function loadSavedPratos() {
+            if (pratosCardapio.length > 0) {
+                document.getElementById('pratosAdicionados').classList.remove('hidden');
+                const container = document.getElementById('listaPratos');
+                container.innerHTML = '';
+
+                pratosCardapio.forEach(prato => {
+                    const card = createPratoCard(prato);
+                    container.appendChild(card);
+                });
+            }
+        }
+
+        // Criar card de prato
+        function createPratoCard(prato) {
+            const div = document.createElement('div');
+            div.className = 'bg-white rounded-lg shadow-sm p-4 relative';
+
+            const tipoRefeicaoLabel = {
+                'cafe': 'Café da Manhã',
+                'almoco': 'Almoço',
+                'lanche': 'Lanche',
+                'jantar': 'Jantar'
+            };
+
+            div.innerHTML = `
+                <button onclick="removePrato(${prato.id})" class="absolute top-2 right-2 text-red-500 hover:text-red-700">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+                ${prato.imagem ? `<img src="${prato.imagem}" class="w-full h-32 object-cover rounded mb-2">` : ''}
+                <h4 class="font-semibold text-restaurant-dark">${prato.nome}</h4>
+                <p class="text-sm text-gray-600">${prato.descricao || 'Sem descrição'}</p>
+                <div class="mt-2 flex flex-wrap gap-1">
+                    <span class="text-xs bg-restaurant-light px-2 py-1 rounded">${tipoRefeicaoLabel[prato.tipoRefeicao]}</span>
+                    <span class="text-xs bg-gray-100 px-2 py-1 rounded">${prato.tipoPrato}</span>
+                    ${prato.tags.map(tag => `<span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">${tag}</span>`).join('')}
+                </div>
+            `;
+
+            return div;
+        }
+
+        // Remover prato
+        function removePrato(id) {
+            pratosCardapio = pratosCardapio.filter(p => p.id !== id);
+            localStorage.setItem('pratosCardapio', JSON.stringify(pratosCardapio));
+            loadSavedPratos();
+            showToast('Prato removido');
+
+            if (pratosCardapio.length === 0) {
+                document.getElementById('pratosAdicionados').classList.add('hidden');
+                updateStatus('Não salvo');
+            }
+        }
+
+        // Mostrar toast
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            const toastDiv = toast.querySelector('div');
+
+            toastMessage.textContent = message;
+
+            if (type === 'error') {
+                toastDiv.classList.remove('bg-green-600');
+                toastDiv.classList.add('bg-red-600');
+            } else {
+                toastDiv.classList.remove('bg-red-600');
+                toastDiv.classList.add('bg-green-600');
+            }
+
+            toast.classList.remove('hidden');
+
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+
+        // Atualizar status
+        function updateStatus(status) {
+            const statusEl = document.getElementById('saveStatus');
+            statusEl.textContent = status;
+
+            if (status === 'Publicado') {
+                statusEl.className = 'px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium';
+            } else if (status === 'Rascunho salvo') {
+                statusEl.className = 'px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm font-medium';
+            } else {
+                statusEl.className = 'px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium';
+            }
+        }
+
+        // Toggle mobile menu
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            const button = document.getElementById('mobile-menu-button');
+            const isExpanded = button.getAttribute('aria-expanded') === 'true';
+
+            mobileMenu.classList.toggle('hidden');
+            button.setAttribute('aria-expanded', !isExpanded);
+
+            // Update button icon
+            const icon = button.querySelector('svg');
+            if (isExpanded) {
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>';
+                button.setAttribute('aria-label', 'Abrir menu de navegação');
+            } else {
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>';
+                button.setAttribute('aria-label', 'Fechar menu de navegação');
+            }
+        }
+
+        // Simular logout
+        function handleLogout() {
+            if (confirm('Deseja sair do sistema?')) {
+                localStorage.clear();
+                alert('Logout realizado com sucesso!');
+                window.location.reload();
+            }
+        }
+
+        // Inicialização adicional
+        document.addEventListener('DOMContentLoaded', () => {
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', (e) => {
+                const mobileMenu = document.getElementById('mobile-menu');
+                const button = document.getElementById('mobile-menu-button');
+
+                if (!button.contains(e.target) && !mobileMenu.contains(e.target)) {
+                    mobileMenu.classList.add('hidden');
+                    button.setAttribute('aria-expanded', 'false');
+                    button.setAttribute('aria-label', 'Abrir menu de navegação');
+                    const icon = button.querySelector('svg');
+                    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>';
+                }
+            });
+        });
+    </script>
+
+    <!-- Footer -->
+    <footer class="bg-restaurant-dark text-white py-8 mt-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div>
+                    <div class="flex items-center space-x-2 mb-3">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                            <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                            <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 1 1 0 000 2H6a2 2 0 100 4h2a2 2 0 100-4h-.5a1 1 0 000-2H8a2 2 0 012-2h2a2 2 0 012 2v9a2 2 0 01-2 2H6a2 2 0 01-2-2V5z"/>
+                        </svg>
+                        <h3 class="text-xl font-bold">Le Menu</h3>
+                    </div>
+                    <p class="text-sm text-gray-300">Sistema de Gestão do Restaurante Universitário UNIFESSPA</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-3">Links Rápidos</h4>
+                    <ul class="space-y-2 text-sm text-gray-300">
+                        <li><a href="lemenu-consulta-cardapio.html" class="hover:text-white transition-colors">Cardápio</a></li>
+                        <li><a href="lemenu-avaliar-refeicao.html" class="hover:text-white transition-colors">Avaliar Refeição</a></li>
+                        <li><a href="lemenu-consultar-avaliacoes.html" class="hover:text-white transition-colors">Ver Avaliações</a></li>
+                        <li><a href="lemenu-gestao-avisos.html" class="hover:text-white transition-colors">Avisos</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-3">Contato</h4>
+                    <ul class="space-y-2 text-sm text-gray-300">
+                        <li><i class="fas fa-phone mr-2" aria-hidden="true"></i> (94) 2101-7100</li>
+                        <li><i class="fas fa-envelope mr-2" aria-hidden="true"></i> ru@unifesspa.edu.br</li>
+                        <li><i class="fas fa-clock mr-2" aria-hidden="true"></i> Seg-Sex: 6:30 - 20:00</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-3">Siga-nos</h4>
+                    <div class="flex space-x-3">
+                        <a href="#" class="bg-white/20 hover:bg-white/30 w-10 h-10 rounded-lg flex items-center justify-center transition-colors" aria-label="Facebook">
+                            <i class="fab fa-facebook-f" aria-hidden="true"></i>
+                        </a>
+                        <a href="#" class="bg-white/20 hover:bg-white/30 w-10 h-10 rounded-lg flex items-center justify-center transition-colors" aria-label="Instagram">
+                            <i class="fab fa-instagram" aria-hidden="true"></i>
+                        </a>
+                        <a href="#" class="bg-white/20 hover:bg-white/30 w-10 h-10 rounded-lg flex items-center justify-center transition-colors" aria-label="Twitter">
+                            <i class="fab fa-twitter" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-6 pt-6 text-center text-sm text-gray-400">
+                <p>&copy; 2024 Le Menu - Restaurante Universitário UNIFESSPA. Todos os direitos reservados.</p>
+                <p class="mt-2">Desenvolvido com <i class="fas fa-heart text-red-500" aria-hidden="true"></i> para nossa comunidade acadêmica</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

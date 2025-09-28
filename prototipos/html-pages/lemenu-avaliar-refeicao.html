@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Le Menu - Avaliar Refeição</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'roboto': ['Roboto', 'sans-serif'],
+                    },
+                    colors: {
+                        'restaurant': {
+                            'primary': '#8B4513',
+                            'secondary': '#D2691E',
+                            'accent': '#FF6B35',
+                            'light': '#FFF5E6',
+                            'green': '#4A7C59',
+                            'dark': '#3E2723'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        main {
+            flex: 1;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .star-rating {
+            display: flex;
+            gap: 8px;
+            font-size: 2rem;
+        }
+        .star {
+            cursor: pointer;
+            color: #ddd;
+            transition: all 0.2s ease;
+        }
+        .star:hover {
+            transform: scale(1.1);
+        }
+        .star.filled {
+            color: #FFD700;
+            animation: starPop 0.3s ease;
+        }
+        @keyframes starPop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+        .meal-card {
+            transition: all 0.3s ease;
+        }
+        .meal-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        .meal-card.selected {
+            border-color: #8B4513;
+            background-color: #FFF5E6;
+        }
+    </style>
+</head>
+<body class="bg-restaurant-light">
+    <!-- Header -->
+    <header class="bg-white shadow-md sticky top-0 z-50" role="banner">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <a href="index.html" class="flex items-center space-x-2" aria-label="Página inicial">
+                    <svg class="w-8 h-8 text-restaurant-primary" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                        <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                        <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 1 1 0 000 2H6a2 2 0 100 4h2a2 2 0 100-4h-.5a1 1 0 000-2H8a2 2 0 012-2h2a2 2 0 012 2v9a2 2 0 01-2 2H6a2 2 0 01-2-2V5z"/>
+                    </svg>
+                    <h1 class="text-xl md:text-2xl font-bold text-restaurant-dark">Le Menu</h1>
+                </a>
+                <nav class="hidden md:flex items-center space-x-6" role="navigation" aria-label="Menu principal">
+                    <a href="lemenu-consulta-cardapio.html" class="text-gray-600 hover:text-restaurant-primary transition-colors" id="nav-cardapio">Cardápio</a>
+                    <a href="lemenu-gestao-avisos.html" class="text-gray-600 hover:text-restaurant-primary transition-colors" id="nav-avisos">Avisos</a>
+                    <a href="lemenu-consultar-avaliacoes.html" class="text-restaurant-primary font-medium" aria-current="page" id="nav-avaliacoes">Avaliações</a>
+                </nav>
+                <!-- Mobile menu button -->
+                <button class="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                        onclick="toggleMobileMenu()"
+                        aria-label="Abrir menu de navegação"
+                        aria-expanded="false"
+                        aria-controls="mobile-menu"
+                        id="mobile-menu-button">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+                <div class="hidden md:flex items-center space-x-3">
+                    <span class="text-sm text-gray-600">Olá, João Silva</span>
+                    <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors" aria-label="Menu do usuário">
+                        <i class="fas fa-user-circle text-gray-600 text-xl" aria-hidden="true"></i>
+                    </button>
+                    <button onclick="handleLogout()" class="p-2 hover:bg-gray-100 rounded-lg transition-colors" aria-label="Sair do sistema">
+                        <i class="fas fa-sign-out-alt text-restaurant-primary" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </div>
+            <!-- Mobile Navigation Menu -->
+            <div class="md:hidden hidden mt-4 pb-4 border-t" id="mobile-menu" role="navigation" aria-label="Menu de navegação móvel">
+                <div class="flex flex-col space-y-2 mt-4">
+                    <a href="lemenu-consulta-cardapio.html" class="block py-2 px-4 text-gray-600 hover:text-restaurant-primary hover:bg-gray-50 rounded-lg transition-colors">Cardápio</a>
+                    <a href="lemenu-gestao-avisos.html" class="block py-2 px-4 text-gray-600 hover:text-restaurant-primary hover:bg-gray-50 rounded-lg transition-colors">Avisos</a>
+                    <a href="lemenu-consultar-avaliacoes.html" class="block py-2 px-4 text-restaurant-primary font-medium rounded-lg bg-restaurant-light" aria-current="page">Avaliações</a>
+                    <div class="mt-2 pt-2 border-t border-gray-200">
+                        <span class="block py-2 px-4 text-sm text-gray-600">Olá, João Silva</span>
+                        <button onclick="handleLogout()" class="w-full text-left py-2 px-4 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                            <i class="fas fa-sign-out-alt mr-2" aria-hidden="true"></i>Sair
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navegação Breadcrumb -->
+    <nav class="bg-white border-b" aria-label="Breadcrumb">
+        <div class="container mx-auto px-4 py-2">
+            <ol class="flex items-center space-x-2 text-sm">
+                <li>
+                    <a href="index.html" class="text-gray-500 hover:text-restaurant-primary transition-colors">
+                        <i class="fas fa-home" aria-hidden="true"></i>
+                        <span class="sr-only">Início</span>
+                    </a>
+                </li>
+                <li>
+                    <span class="text-gray-400 mx-2">/</span>
+                </li>
+                <li>
+                    <span class="text-restaurant-primary font-medium" aria-current="page">Avaliar Refeição</span>
+                </li>
+            </ol>
+        </div>
+    </nav>
+
+    <main role="main">
+        <div class="container mx-auto px-4 py-6">
+            <!-- Cabeçalho da Página -->
+            <div class="mb-6 fade-in">
+                <h2 class="text-2xl font-bold text-restaurant-dark mb-2">Avaliar Refeição</h2>
+                <p class="text-gray-600">Sua opinião é importante para melhorarmos nossos serviços!</p>
+            </div>
+
+            <!-- Progresso -->
+            <div class="bg-white rounded-xl shadow-sm p-4 mb-6 fade-in">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm text-gray-600">Etapa 1 de 3</span>
+                    <span class="text-sm text-restaurant-primary font-medium">Selecione a Refeição</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div id="progressBar" class="bg-restaurant-primary h-2 rounded-full transition-all duration-300" style="width: 33%"></div>
+                </div>
+            </div>
+
+            <!-- Etapa 1: Seleção de Refeição -->
+            <div id="step1" class="fade-in">
+                <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+                    <h3 class="text-lg font-semibold text-restaurant-dark mb-4">
+                        <i class="fas fa-utensils text-restaurant-primary mr-2"></i>
+                        Qual refeição você deseja avaliar?
+                    </h3>
+
+                    <!-- Filtro de Data -->
+                    <div class="flex flex-col sm:flex-row gap-4 mb-6">
+                        <div class="flex-1">
+                            <label for="mealDate" class="block text-sm font-medium text-gray-700 mb-2">Data da Refeição</label>
+                            <input type="date"
+                                   id="mealDate"
+                                   name="mealDate"
+                                   value="2024-09-29"
+                                   max="2024-09-29"
+                                   aria-label="Selecionar data da refeição"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-restaurant-primary focus:border-transparent">
+                        </div>
+                        <div class="flex-1">
+                            <label for="mealType" class="block text-sm font-medium text-gray-700 mb-2">Tipo de Refeição</label>
+                            <select id="mealType"
+                                    name="mealType"
+                                    onchange="filterMeals()"
+                                    aria-label="Filtrar por tipo de refeição"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-restaurant-primary focus:border-transparent">
+                                <option value="">Todas</option>
+                                <option value="cafe">Café da Manhã</option>
+                                <option value="almoco">Almoço</option>
+                                <option value="jantar">Jantar</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Lista de Refeições -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Café da Manhã -->
+                        <div class="meal-card border-2 border-gray-200 rounded-lg p-4 cursor-pointer hover:border-restaurant-primary"
+                             onclick="selectMeal(this, 'Café da Manhã - 29/09', 'cafe')" data-meal-type="cafe">
+                            <div class="flex items-start justify-between">
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <i class="fas fa-coffee text-brown-600"></i>
+                                        <h4 class="font-semibold text-gray-800">Café da Manhã</h4>
+                                        <span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded">06:30 - 08:30</span>
+                                    </div>
+                                    <ul class="text-sm text-gray-600 space-y-1">
+                                        <li>• Pão francês com manteiga</li>
+                                        <li>• Café com leite</li>
+                                        <li>• Frutas da estação</li>
+                                    </ul>
+                                </div>
+                                <div class="ml-2">
+                                    <input type="radio" name="meal" class="text-restaurant-primary focus:ring-restaurant-primary">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Almoço -->
+                        <div class="meal-card border-2 border-gray-200 rounded-lg p-4 cursor-pointer hover:border-restaurant-primary"
+                             onclick="selectMeal(this, 'Almoço - 29/09', 'almoco')" data-meal-type="almoco">
+                            <div class="flex items-start justify-between">
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <i class="fas fa-utensils text-green-600"></i>
+                                        <h4 class="font-semibold text-gray-800">Almoço</h4>
+                                        <span class="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded">11:00 - 14:00</span>
+                                    </div>
+                                    <ul class="text-sm text-gray-600 space-y-1">
+                                        <li>• Frango Grelhado</li>
+                                        <li>• Arroz, Feijão, Salada</li>
+                                        <li>• Pudim de Leite</li>
+                                    </ul>
+                                </div>
+                                <div class="ml-2">
+                                    <input type="radio" name="meal" class="text-restaurant-primary focus:ring-restaurant-primary">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Jantar -->
+                        <div class="meal-card border-2 border-gray-200 rounded-lg p-4 cursor-pointer hover:border-restaurant-primary"
+                             onclick="selectMeal(this, 'Jantar - 29/09', 'jantar')" data-meal-type="jantar">
+                            <div class="flex items-start justify-between">
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <i class="fas fa-moon text-purple-600"></i>
+                                        <h4 class="font-semibold text-gray-800">Jantar</h4>
+                                        <span class="text-xs bg-purple-100 text-purple-800 px-2 py-0.5 rounded">18:00 - 20:00</span>
+                                    </div>
+                                    <ul class="text-sm text-gray-600 space-y-1">
+                                        <li>• Sopa de Legumes</li>
+                                        <li>• Pão integral</li>
+                                        <li>• Chá ou Suco</li>
+                                    </ul>
+                                </div>
+                                <div class="ml-2">
+                                    <input type="radio" name="meal" class="text-restaurant-primary focus:ring-restaurant-primary">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botão Próximo -->
+                <div class="flex justify-end">
+                    <button onclick="goToStep2()" id="nextBtn1" disabled
+                            class="px-6 py-2 bg-gray-300 text-gray-500 rounded-lg font-medium cursor-not-allowed transition-all">
+                        Próximo <i class="fas fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Etapa 2: Avaliação -->
+            <div id="step2" class="hidden">
+                <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+                    <h3 class="text-lg font-semibold text-restaurant-dark mb-6">
+                        <i class="fas fa-star text-restaurant-primary mr-2"></i>
+                        Avalie sua experiência
+                    </h3>
+
+                    <!-- Refeição Selecionada -->
+                    <div class="bg-restaurant-light rounded-lg p-4 mb-6">
+                        <p class="text-sm text-gray-600">Avaliando:</p>
+                        <p class="font-semibold text-restaurant-dark" id="selectedMealText">-</p>
+                    </div>
+
+                    <!-- Avaliação Geral -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-3">Como foi sua experiência geral?</label>
+                        <div class="star-rating justify-center" id="mainRating">
+                            <i class="fas fa-star star" data-rating="1" onclick="setRating('main', 1)"></i>
+                            <i class="fas fa-star star" data-rating="2" onclick="setRating('main', 2)"></i>
+                            <i class="fas fa-star star" data-rating="3" onclick="setRating('main', 3)"></i>
+                            <i class="fas fa-star star" data-rating="4" onclick="setRating('main', 4)"></i>
+                            <i class="fas fa-star star" data-rating="5" onclick="setRating('main', 5)"></i>
+                        </div>
+                        <p class="text-center text-sm text-gray-500 mt-2" id="ratingText">Clique para avaliar</p>
+                    </div>
+
+                    <!-- Aspectos Específicos -->
+                    <div class="space-y-4 mb-6">
+                        <div class="border-t pt-4">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm font-medium text-gray-700">Sabor</span>
+                                <div class="flex gap-1">
+                                    <i class="fas fa-star star text-sm" onclick="setSubRating('sabor', 1)"></i>
+                                    <i class="fas fa-star star text-sm" onclick="setSubRating('sabor', 2)"></i>
+                                    <i class="fas fa-star star text-sm" onclick="setSubRating('sabor', 3)"></i>
+                                    <i class="fas fa-star star text-sm" onclick="setSubRating('sabor', 4)"></i>
+                                    <i class="fas fa-star star text-sm" onclick="setSubRating('sabor', 5)"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm font-medium text-gray-700">Temperatura</span>
+                                <div class="flex gap-1">
+                                    <i class="fas fa-star star text-sm" onclick="setSubRating('temperatura', 1)"></i>
+                                    <i class="fas fa-star star text-sm" onclick="setSubRating('temperatura', 2)"></i>
+                                    <i class="fas fa-star star text-sm" onclick="setSubRating('temperatura', 3)"></i>
+                                    <i class="fas fa-star star text-sm" onclick="setSubRating('temperatura', 4)"></i>
+                                    <i class="fas fa-star star text-sm" onclick="setSubRating('temperatura', 5)"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm font-medium text-gray-700">Quantidade</span>
+                                <div class="flex gap-1">
+                                    <i class="fas fa-star star text-sm" onclick="setSubRating('quantidade', 1)"></i>
+                                    <i class="fas fa-star star text-sm" onclick="setSubRating('quantidade', 2)"></i>
+                                    <i class="fas fa-star star text-sm" onclick="setSubRating('quantidade', 3)"></i>
+                                    <i class="fas fa-star star text-sm" onclick="setSubRating('quantidade', 4)"></i>
+                                    <i class="fas fa-star star text-sm" onclick="setSubRating('quantidade', 5)"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm font-medium text-gray-700">Apresentação</span>
+                                <div class="flex gap-1">
+                                    <i class="fas fa-star star text-sm" onclick="setSubRating('apresentacao', 1)"></i>
+                                    <i class="fas fa-star star text-sm" onclick="setSubRating('apresentacao', 2)"></i>
+                                    <i class="fas fa-star star text-sm" onclick="setSubRating('apresentacao', 3)"></i>
+                                    <i class="fas fa-star star text-sm" onclick="setSubRating('apresentacao', 4)"></i>
+                                    <i class="fas fa-star star text-sm" onclick="setSubRating('apresentacao', 5)"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                        <!-- Avaliação por prato (Opcional) -->
+                        <div class="mb-6">
+                            <div class="flex items-center justify-between mb-2">
+                                <h4 class="text-sm font-semibold text-gray-700">Avaliação por prato (opcional)</h4>
+                                <button type="button" onclick="addDishRow()" class="text-xs bg-white border border-restaurant-primary text-restaurant-primary px-3 py-1.5 rounded-lg hover:bg-restaurant-light transition-colors">
+                                    <i class="fas fa-plus mr-1"></i> Adicionar prato
+                                </button>
+                            </div>
+                            <div id="dishesList" class="space-y-3" aria-live="polite"></div>
+                            <p class="text-xs text-gray-500 mt-1">Ex.: Feijoada (5), Pudim (3)</p>
+                        </div>
+
+
+                    <!-- Comentário -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Comentários (Opcional)</label>
+                        <textarea id="comments" rows="4" maxlength="500" placeholder="Compartilhe sua experiência..."
+                                  onkeyup="updateCharCount()"
+                                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-restaurant-primary focus:border-transparent"></textarea>
+                        <p class="text-xs text-gray-500 text-right mt-1"><span id="charCount">0</span>/500 caracteres</p>
+                    </div>
+
+                    <!-- Feedback para notas baixas -->
+                    <div id="lowRatingFeedback" class="hidden bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                        <p class="text-sm text-yellow-800 mb-2">
+                            <i class="fas fa-exclamation-triangle mr-2"></i>
+                            Sentimos muito que sua experiência não foi satisfatória. Pode nos contar mais sobre o que aconteceu?
+                        </p>
+                        <div class="space-y-2 mt-3">
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-2"> Comida fria
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-2"> Sabor inadequado
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-2"> Porção pequena
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-2"> Demora no atendimento
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botões de Navegação -->
+                <div class="flex justify-between">
+                    <button onclick="goToStep1()"
+                            class="px-6 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-medium transition-colors">
+                        <i class="fas fa-arrow-left mr-2"></i> Voltar
+                    </button>
+                    <button onclick="goToStep3()" id="nextBtn2" disabled
+                            class="px-6 py-2 bg-gray-300 text-gray-500 rounded-lg font-medium cursor-not-allowed transition-all">
+                        Próximo <i class="fas fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Etapa 3: Confirmação -->
+            <div id="step3" class="hidden">
+                <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+                    <div class="text-center mb-6">
+                        <div class="bg-green-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-check text-green-600 text-3xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-restaurant-dark mb-2">Obrigado pela sua avaliação!</h3>
+                        <p class="text-gray-600">Sua opinião nos ajuda a melhorar constantemente.</p>
+                    </div>
+
+                    <!-- Resumo da Avaliação -->
+                    <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                        <h4 class="font-semibold text-gray-800 mb-3">Resumo da sua avaliação:</h4>
+                        <div class="space-y-2">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Refeição:</span>
+                                <span class="font-medium" id="summaryMeal">-</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Avaliação:</span>
+                                <div id="summaryRating">-</div>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Comentário:</span>
+                                <span class="font-medium" id="summaryComment">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ações Adicionais -->
+                    <div class="bg-restaurant-light rounded-lg p-4 mb-6">
+                        <p class="text-sm text-gray-700 mb-3">Gostaria de fazer mais alguma coisa?</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <button onclick="window.location.reload()" class="bg-white hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg transition-colors border border-gray-200">
+                                <i class="fas fa-plus mr-2"></i> Avaliar Outra Refeição
+                            </button>
+                            <button onclick="window.location.href='#'" class="bg-white hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg transition-colors border border-gray-200">
+                                <i class="fas fa-history mr-2"></i> Ver Minhas Avaliações
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botão Finalizar -->
+                <div class="flex justify-center">
+                    <button onclick="finish()"
+                            class="px-8 py-3 bg-restaurant-primary hover:bg-restaurant-dark text-white rounded-lg font-medium transition-colors">
+                        Finalizar <i class="fas fa-check ml-2"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-restaurant-dark text-white py-8 mt-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <!-- Logo e Descrição -->
+                <div>
+                    <div class="flex items-center space-x-2 mb-3">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                            <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 1 1 0 000 2H6a2 2 0 100 4h2a2 2 0 100-4h-.5a1 1 0 000-2H8a2 2 0 012-2h2a2 2 0 012 2v9a2 2 0 01-2 2H6a2 2 0 01-2-2V5z"/>
+                        </svg>
+                        <h3 class="text-xl font-bold">Le Menu</h3>
+                    </div>
+                    <p class="text-sm text-gray-300">Sistema de Gestão do Restaurante Universitário UNIFESSPA</p>
+                </div>
+
+                <!-- Links Rápidos -->
+                <div>
+                    <h4 class="font-semibold mb-3">Links Rápidos</h4>
+                    <ul class="space-y-2 text-sm text-gray-300">
+                        <li><a href="#" class="hover:text-white transition-colors">Cardápio</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Fazer Reserva</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Avaliar Refeição</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Avisos</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contato -->
+                <div>
+                    <h4 class="font-semibold mb-3">Contato</h4>
+                    <ul class="space-y-2 text-sm text-gray-300">
+                        <li><i class="fas fa-phone mr-2"></i> (94) 2101-7100</li>
+                        <li><i class="fas fa-envelope mr-2"></i> ru@unifesspa.edu.br</li>
+                        <li><i class="fas fa-clock mr-2"></i> Seg-Sex: 6:30 - 20:00</li>
+                    </ul>
+                </div>
+
+                <!-- Redes Sociais -->
+                <div>
+                    <h4 class="font-semibold mb-3">Siga-nos</h4>
+                    <div class="flex space-x-3">
+                        <a href="#" class="bg-white/20 hover:bg-white/30 w-10 h-10 rounded-lg flex items-center justify-center transition-colors">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="bg-white/20 hover:bg-white/30 w-10 h-10 rounded-lg flex items-center justify-center transition-colors">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="bg-white/20 hover:bg-white/30 w-10 h-10 rounded-lg flex items-center justify-center transition-colors">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-700 mt-6 pt-6 text-center text-sm text-gray-400">
+                <p>&copy; 2024 Le Menu - Restaurante Universitário UNIFESSPA. Todos os direitos reservados.</p>
+                <p class="mt-2">Desenvolvido com <i class="fas fa-heart text-red-500"></i> para nossa comunidade acadêmica</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Estado da aplicação
+        let selectedMeal = null;
+        let mainRating = 0;
+        let ratings = {
+            main: 0,
+            sabor: 0,
+            temperatura: 0,
+            quantidade: 0,
+            apresentacao: 0
+        };
+
+	        // Tipo da refeição selecionada (cafe|almoco|jantar)
+	        let selectedMealType = null;
+
+
+        // Selecionar refeição
+        function selectMeal(element, mealName, type) {
+            document.querySelectorAll('.meal-card').forEach(card => {
+                card.classList.remove('selected');
+                card.querySelector('input[type="radio"]').checked = false;
+            });
+
+            element.classList.add('selected');
+            element.querySelector('input[type="radio"]').checked = true;
+            selectedMeal = mealName;
+            selectedMealType = type;
+
+            document.getElementById('nextBtn1').disabled = false;
+            document.getElementById('nextBtn1').classList.remove('bg-gray-300', 'text-gray-500', 'cursor-not-allowed');
+            document.getElementById('nextBtn1').classList.add('bg-restaurant-primary', 'text-white', 'hover:bg-restaurant-dark');
+        }
+
+        // Filtrar refeições
+        function filterMeals() {
+            const filter = document.getElementById('mealType').value;
+            document.querySelectorAll('.meal-card').forEach(card => {
+                if (filter === '' || card.dataset.mealType === filter) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Navegação entre etapas
+        function goToStep2() {
+            if (!selectedMeal) return;
+
+            document.getElementById('step1').classList.add('hidden');
+            document.getElementById('step2').classList.remove('hidden');
+            document.getElementById('selectedMealText').textContent = selectedMeal;
+            document.getElementById('progressBar').style.width = '66%';
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function goToStep1() {
+            document.getElementById('step2').classList.add('hidden');
+            document.getElementById('step1').classList.remove('hidden');
+            document.getElementById('progressBar').style.width = '33%';
+        }
+
+        function goToStep3() {
+            if (mainRating === 0) return;
+
+            document.getElementById('step2').classList.add('hidden');
+            document.getElementById('step3').classList.remove('hidden');
+            document.getElementById('progressBar').style.width = '100%';
+
+            // Preencher resumo
+            document.getElementById('summaryMeal').textContent = selectedMeal;
+            document.getElementById('summaryRating').innerHTML = getStarHTML(mainRating);
+            document.getElementById('summaryComment').textContent =
+                document.getElementById('comments').value || 'Sem comentários';
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Sistema de avaliação com estrelas
+        function setRating(type, rating) {
+            mainRating = rating;
+            ratings.main = rating;
+
+            const stars = document.querySelectorAll('#mainRating .star');
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.classList.add('filled');
+                } else {
+                    star.classList.remove('filled');
+                }
+            });
+
+            // Atualizar texto
+            const texts = ['', 'Péssimo', 'Ruim', 'Regular', 'Bom', 'Excelente'];
+            document.getElementById('ratingText').textContent = texts[rating];
+
+            // Mostrar feedback para notas baixas
+            if (rating <= 2) {
+                document.getElementById('lowRatingFeedback').classList.remove('hidden');
+            } else {
+                document.getElementById('lowRatingFeedback').classList.add('hidden');
+            }
+
+            // Habilitar botão próximo
+            document.getElementById('nextBtn2').disabled = false;
+            document.getElementById('nextBtn2').classList.remove('bg-gray-300', 'text-gray-500', 'cursor-not-allowed');
+            document.getElementById('nextBtn2').classList.add('bg-restaurant-primary', 'text-white', 'hover:bg-restaurant-dark');
+        }
+
+        // Avaliação por prato (dinâmico)
+        function addDishRow() {
+            const list = document.getElementById('dishesList');
+            const row = document.createElement('div');
+            row.className = 'flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-lg p-3';
+            row.setAttribute('data-rating', '0');
+            row.innerHTML = `
+                <input type="text" placeholder="Nome do prato" class="flex-1 text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-restaurant-primary focus:border-transparent" />
+                <div class="flex items-center gap-1 dish-stars">
+                    <i class="fas fa-star star text-sm" onclick="setDishRowRating(this,1)"></i>
+                    <i class="fas fa-star star text-sm" onclick="setDishRowRating(this,2)"></i>
+                    <i class="fas fa-star star text-sm" onclick="setDishRowRating(this,3)"></i>
+                    <i class="fas fa-star star text-sm" onclick="setDishRowRating(this,4)"></i>
+                    <i class="fas fa-star star text-sm" onclick="setDishRowRating(this,5)"></i>
+                </div>
+                <button type="button" class="text-gray-500 hover:text-red-600" title="Remover" onclick="this.parentElement.remove()">
+                    <i class="fas fa-trash"></i>
+                </button>
+            `;
+            list.appendChild(row);
+        }
+        function setDishRowRating(starEl, rating) {
+            const row = starEl.closest('div.flex.items-center');
+            if (!row) return;
+            row.setAttribute('data-rating', String(rating));
+            const stars = row.querySelectorAll('.star');
+            stars.forEach((s, idx) => {
+                if (idx < rating) s.classList.add('filled'); else s.classList.remove('filled');
+            });
+        }
+
+
+        function setSubRating(aspect, rating) {
+            ratings[aspect] = rating;
+            const stars = event.target.parentElement.querySelectorAll('.star');
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.classList.add('filled');
+                } else {
+                    star.classList.remove('filled');
+                }
+            });
+        }
+
+        // Contador de caracteres
+        function updateCharCount() {
+            const count = document.getElementById('comments').value.length;
+            document.getElementById('charCount').textContent = count;
+        }
+
+        // Gerar HTML de estrelas
+        function getStarHTML(rating) {
+            let html = '';
+            for (let i = 1; i <= 5; i++) {
+                if (i <= rating) {
+                    html += '<i class="fas fa-star text-yellow-500"></i>';
+                } else {
+                    html += '<i class="fas fa-star text-gray-300"></i>';
+                }
+            }
+            return html;
+        }
+
+        // Toggle mobile menu
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            const button = document.getElementById('mobile-menu-button');
+            const isExpanded = button.getAttribute('aria-expanded') === 'true';
+
+            mobileMenu.classList.toggle('hidden');
+            button.setAttribute('aria-expanded', !isExpanded);
+
+            // Update button icon
+            const icon = button.querySelector('svg');
+            if (isExpanded) {
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>';
+                button.setAttribute('aria-label', 'Abrir menu de navegação');
+            } else {
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>';
+                button.setAttribute('aria-label', 'Fechar menu de navegação');
+            }
+
+        }
+
+        // Finalizar
+        function finish() {
+            // Persistir avaliação localmente (protótipo)
+            const EVALS_KEY = 'lemenu_evaluations';
+            let list = [];
+            try { list = JSON.parse(localStorage.getItem(EVALS_KEY)) || []; } catch (e) { list = []; }
+            // Coletar avaliações por prato
+            const dishes = [];
+            try {
+                document.querySelectorAll('#dishesList > div').forEach(row => {
+                    const name = (row.querySelector('input')?.value || '').trim();
+                    const rating = Number(row.getAttribute('data-rating') || 0);
+                    if (name && rating > 0) dishes.push({ name, rating });
+                });
+            } catch (e) {}
+
+            list.push({
+                mealType: selectedMealType || 'almoco',
+                rating: Number(mainRating || 0),
+                comment: document.getElementById('comments').value || '',
+                dishes,
+                date: new Date().toISOString()
+            });
+            try { localStorage.setItem(EVALS_KEY, JSON.stringify(list)); } catch (e) {}
+
+            // Redirecionar para consulta de cardápio com confirmação
+            const redirect = `lemenu-consulta-cardapio.html?rated=1&meal=${encodeURIComponent(selectedMealType || '')}`;
+            window.location.href = redirect;
+        }
+        function handleLogout() {
+            if (confirm('Deseja sair do sistema?')) {
+                try { localStorage.clear(); } catch (e) {}
+                alert('Logout realizado com sucesso!');
+                window.location.reload();
+            }
+        }
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', () => {
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', (e) => {
+                const mobileMenu = document.getElementById('mobile-menu');
+                const button = document.getElementById('mobile-menu-button');
+
+                if (!button.contains(e.target) && !mobileMenu.contains(e.target)) {
+                    mobileMenu.classList.add('hidden');
+                    button.setAttribute('aria-expanded', 'false');
+                    button.setAttribute('aria-label', 'Abrir menu de navegação');
+                    const icon = button.querySelector('svg');
+                    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>';
+                }
+            });
+
+            // Pré-seleção vinda da consulta do cardápio
+            try {
+                const params = new URLSearchParams(window.location.search);
+                const meal = params.get('meal'); // cafe | almoco | jantar
+                if (meal) {
+                    const card = document.querySelector(`.meal-card[data-meal-type="${meal}"]`);
+                    if (card) {
+                        const title = (card.querySelector('h4') && card.querySelector('h4').textContent) || 'Refeição';
+                        selectMeal(card, `${title} (do cardápio)`, meal);
+                        // Avança direto para a etapa 2
+                        goToStep2();
+                    }
+                }
+            } catch (e) { /* ignore */ }
+
+        });
+    </script>
+</body>
+
+</html>

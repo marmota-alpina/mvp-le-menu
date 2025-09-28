@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Le Menu - Restaurante Universitário UNIFESSPA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'roboto': ['Roboto', 'sans-serif'],
+                    },
+                    colors: {
+                        'restaurant': {
+                            'primary': '#8B4513',    // Marrom quente
+                            'secondary': '#D2691E',  // Chocolate
+                            'accent': '#FF6B35',     // Laranja queimado
+                            'light': '#FFF5E6',      // Creme
+                            'green': '#4A7C59',      // Verde orgânico
+                            'dark': '#3E2723'        // Marrom escuro
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+        .fade-in {
+            animation: fadeIn 0.8s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .slide-in {
+            animation: slideIn 0.6s ease-out;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(0); }
+        }
+        .pulse-soft {
+            animation: pulseSoft 2s infinite;
+        }
+        @keyframes pulseSoft {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        .menu-card {
+            transition: all 0.3s ease;
+        }
+        .menu-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+    </style>
+</head>
+<body class="bg-restaurant-light">
+    <!-- Header -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <a href="index.html" class="flex items-center space-x-2" aria-label="Página inicial">
+                    <svg class="w-8 h-8 text-restaurant-primary" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                        <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 1 1 0 000 2H6a2 2 0 100 4h2a2 2 0 100-4h-.5a1 1 0 000-2H8a2 2 0 012-2h2a2 2 0 012 2v9a2 2 0 01-2 2H6a2 2 0 01-2-2V5z"/>
+                    </svg>
+                    <h1 class="text-xl md:text-2xl font-bold text-restaurant-dark">Le Menu</h1>
+                </a>
+                    <nav class="hidden md:flex items-center space-x-6" role="navigation" aria-label="Menu principal">
+                        <a href="index.html" class="text-restaurant-primary font-medium" aria-current="page" id="nav-inicio">Início</a>
+                        <a href="lemenu-consulta-cardapio.html" class="text-gray-600 hover:text-restaurant-primary transition-colors" id="nav-cardapio">Cardápio</a>
+                        <a href="lemenu-gestao-avisos.html" class="text-gray-600 hover:text-restaurant-primary transition-colors" id="nav-avisos">Avisos</a>
+                        <a href="lemenu-consultar-avaliacoes.html" class="text-gray-600 hover:text-restaurant-primary transition-colors" id="nav-avaliacoes">Avaliações</a>
+                    </nav>
+                    <button class="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                            onclick="toggleMobileMenu()"
+                            aria-label="Abrir menu de navegação"
+                            aria-expanded="false"
+                            aria-controls="mobile-menu"
+                            id="mobile-menu-button">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                    </button>
+
+                <div class="hidden md:flex items-center space-x-3">
+
+                    <span class="text-sm text-gray-600">Olá, João Silva</span>
+                    <button onclick="handleLogout()" class="p-2 hover:bg-gray-100 rounded-lg transition-colors" aria-label="Sair do sistema">
+                        <i class="fas fa-sign-out-alt text-restaurant-primary"></i>
+                    </button>
+                </div>
+            </div>
+            <!-- Mobile Navigation Menu -->
+            <div class="md:hidden hidden mt-4 pb-4 border-t" id="mobile-menu" role="navigation" aria-label="Menu de navegação móvel">
+                <div class="flex flex-col space-y-2 mt-4">
+                    <a href="index.html" class="block py-2 px-4 text-restaurant-primary font-medium rounded-lg bg-restaurant-light" aria-current="page">Início</a>
+                    <a href="lemenu-consulta-cardapio.html" class="block py-2 px-4 text-gray-600 hover:text-restaurant-primary hover:bg-gray-50 rounded-lg transition-colors">Cardápio</a>
+                    <a href="lemenu-gestao-avisos.html" class="block py-2 px-4 text-gray-600 hover:text-restaurant-primary hover:bg-gray-50 rounded-lg transition-colors">Avisos</a>
+                    <a href="lemenu-consultar-avaliacoes.html" class="block py-2 px-4 text-gray-600 hover:text-restaurant-primary hover:bg-gray-50 rounded-lg transition-colors">Avaliações</a>
+                    <div class="mt-2 pt-2 border-t border-gray-200">
+                        <span class="block py-2 px-4 text-sm text-gray-600">Olá, João Silva</span>
+                        <button onclick="handleLogout()" class="w-full text-left py-2 px-4 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                            </svg>Sair
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </header>
+
+    <!-- Hero Section com Prato do Dia -->
+    <section class="bg-gradient-to-br from-restaurant-primary to-restaurant-secondary text-white py-8 md:py-12">
+        <div class="container mx-auto px-4">
+            <h2 class="text-2xl md:text-4xl font-bold mb-2 fade-in">Cardápio de Hoje</h2>
+            <p class="text-restaurant-light mb-6 fade-in" id="currentDate"></p>
+
+            <!-- Grid de Pratos do Dia - Mobile First com Imagens -->
+            <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 mt-6">
+                <!-- Prato Principal -->
+                <div class="menu-card bg-white/95 rounded-xl overflow-hidden text-restaurant-dark group">
+                    <div class="relative h-32 sm:h-36 lg:h-40 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1532550907401-a500c9a57435?w=400&h=300&fit=crop"
+                             alt="Frango Grelhado"
+
+                             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+                        <div class="absolute top-2 left-2 bg-restaurant-accent p-1.5 rounded-lg">
+                            <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                                <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 1 1 0 000 2H6a2 2 0 100 4h2a2 2 0 100-4h-.5a1 1 0 000-2H8a2 2 0 012-2h2a2 2 0 012 2v9a2 2 0 01-2 2H6a2 2 0 01-2-2V5z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="p-3 sm:p-4">
+                        <h3 class="font-semibold text-sm sm:text-base">Principal</h3>
+                        <p class="text-gray-700 font-medium text-sm sm:text-base mt-1">Frango Grelhado</p>
+                        <p class="text-xs text-gray-500 mt-1 hidden sm:block">Temperado com ervas finas</p>
+                    </div>
+                </div>
+
+                <!-- Acompanhamento -->
+                <div class="menu-card bg-white/95 rounded-xl overflow-hidden text-restaurant-dark group">
+                    <div class="relative h-32 sm:h-36 lg:h-40 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1536304993881-ff6e9eefa2a6?w=400&h=300&fit=crop"
+                             alt="Arroz Integral"
+                             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+                        <div class="absolute top-2 left-2 bg-restaurant-green p-1.5 rounded-lg">
+                            <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="p-3 sm:p-4">
+                        <h3 class="font-semibold text-sm sm:text-base">Acompanhamento</h3>
+                        <p class="text-gray-700 font-medium text-sm sm:text-base mt-1">Arroz Integral</p>
+                        <p class="text-xs text-gray-500 mt-1 hidden sm:block">Com brócolis</p>
+                    </div>
+                </div>
+
+                <!-- Guarnição -->
+                <div class="menu-card bg-white/95 rounded-xl overflow-hidden text-restaurant-dark group">
+                    <div class="relative h-32 sm:h-36 lg:h-40 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1630409346824-4f0e7b080087?w=400&h=300&fit=crop"
+                             alt="Farofa Dourada"
+                             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+                        <div class="absolute top-2 left-2 bg-restaurant-secondary p-1.5 rounded-lg">
+                            <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"/>
+                                <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="p-3 sm:p-4">
+                        <h3 class="font-semibold text-sm sm:text-base">Guarnição</h3>
+                        <p class="text-gray-700 font-medium text-sm sm:text-base mt-1">Farofa Dourada</p>
+                        <p class="text-xs text-gray-500 mt-1 hidden sm:block">Com bacon crocante</p>
+                    </div>
+                </div>
+
+                <!-- Vegetariano -->
+                <div class="menu-card bg-white/95 rounded-xl overflow-hidden text-restaurant-dark group">
+                    <div class="relative h-32 sm:h-36 lg:h-40 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&h=300&fit=crop"
+                             alt="Lasanha de Legumes"
+                             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+                        <div class="absolute top-2 left-2 bg-green-600 p-1.5 rounded-lg">
+                            <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732l-3.354 1.935-1.18 4.455a1 1 0 01-1.933 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732l3.354-1.935 1.18-4.455A1 1 0 0112 2z"/>
+                            </svg>
+                        </div>
+                        <span class="absolute top-2 right-2 bg-green-600 text-white text-xs px-2 py-1 rounded-full font-medium">Veg</span>
+                    </div>
+                    <div class="p-3 sm:p-4">
+                        <h3 class="font-semibold text-sm sm:text-base">Vegetariano</h3>
+                        <p class="text-gray-700 font-medium text-sm sm:text-base mt-1">Lasanha de Legumes</p>
+                        <p class="text-xs text-gray-500 mt-1 hidden sm:block">Molho branco especial</p>
+                    </div>
+                </div>
+
+                <!-- Sobremesa -->
+                <div class="menu-card bg-white/95 rounded-xl overflow-hidden text-restaurant-dark group col-span-2 sm:col-span-1">
+                    <div class="relative h-32 sm:h-36 lg:h-40 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1624353365286-3f8d62daad51?w=400&h=300&fit=crop"
+                             alt="Pudim de Leite"
+                             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+                        <div class="absolute top-2 left-2 bg-pink-500 p-1.5 rounded-lg">
+                            <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="p-3 sm:p-4">
+                        <h3 class="font-semibold text-sm sm:text-base">Sobremesa</h3>
+                        <p class="text-gray-700 font-medium text-sm sm:text-base mt-1">Pudim de Leite</p>
+                        <p class="text-xs text-gray-500 mt-1 hidden sm:block">Receita tradicional</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Horários -->
+            <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                <div class="bg-white/20 backdrop-blur-sm rounded-lg p-3">
+                    <p class="font-semibold">Café da Manhã</p>
+                    <p class="text-sm">06:30 - 08:30</p>
+                </div>
+                <div class="bg-white/20 backdrop-blur-sm rounded-lg p-3">
+                    <p class="font-semibold">Almoço</p>
+                    <p class="text-sm">11:00 - 14:00</p>
+                </div>
+                <div class="bg-white/20 backdrop-blur-sm rounded-lg p-3">
+                    <p class="font-semibold">Jantar</p>
+                    <p class="text-sm">18:00 - 20:00</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Avisos e Notícias -->
+    <section class="py-8 md:py-12 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-2xl md:text-3xl font-bold text-restaurant-dark mb-6 slide-in">Últimas Notícias</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Aviso Principal - Destaque -->
+                <div class="md:col-span-2 lg:col-span-1 bg-gradient-to-br from-restaurant-accent to-restaurant-secondary text-white rounded-xl p-6 pulse-soft">
+                    <div class="flex items-start mb-3">
+                        <div class="bg-white/20 p-2 rounded-lg">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"/>
+                            </svg>
+                        </div>
+                        <span class="ml-3 text-sm font-medium bg-white/20 px-2 py-1 rounded">NOVO!</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Reserve suas refeições online!</h3>
+                    <p class="text-white/90 mb-4">Sabia que agora você pode reservar suas refeições com antecedência? Evite filas, garanta seu prato favorito e ainda ajude a reduzir o desperdício de alimentos!</p>
+                    <button class="bg-white text-restaurant-accent px-4 py-2 rounded-lg font-medium hover:bg-restaurant-light transition-colors">
+                        Saiba Mais →
+                    </button>
+                </div>
+
+                <!-- Aviso 2 -->
+                <div class="bg-gray-50 rounded-xl p-6 border-l-4 border-restaurant-green">
+                    <div class="flex items-center mb-3">
+                        <svg class="w-6 h-6 text-restaurant-green mr-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
+                        </svg>
+                        <span class="text-sm text-gray-500">Há 2 horas</span>
+                    </div>
+                    <h3 class="text-lg font-semibold text-restaurant-dark mb-2">Cardápio Especial Sexta-feira</h3>
+                    <p class="text-gray-600">Feijoada completa com todos os acompanhamentos tradicionais! Não perca essa delícia.</p>
+                </div>
+
+                <!-- Aviso 3 -->
+                <div class="bg-gray-50 rounded-xl p-6 border-l-4 border-restaurant-secondary">
+                    <div class="flex items-center mb-3">
+                        <svg class="w-6 h-6 text-restaurant-secondary mr-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"/>
+                        </svg>
+                        <span class="text-sm text-gray-500">Ontem</span>
+                    </div>
+                    <h3 class="text-lg font-semibold text-restaurant-dark mb-2">Horário Especial - Feriado</h3>
+                    <p class="text-gray-600">No próximo feriado, dia 15/10, o RU funcionará em horário reduzido: apenas almoço das 11h às 13h.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Actions -->
+    <section class="py-8 bg-restaurant-light">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <a href="lemenu-consulta-cardapio.html" class="bg-white p-4 rounded-lg shadow hover:shadow-lg transition-shadow text-center group">
+                    <svg class="w-8 h-8 mx-auto mb-2 text-restaurant-primary group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                        <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 1 1 0 000 2H6a2 2 0 100 4h2a2 2 0 100-4h-.5a1 1 0 000-2H8a2 2 0 012-2h2a2 2 0 012 2v9a2 2 0 01-2 2H6a2 2 0 01-2-2V5z"/>
+                    </svg>
+                    <p class="text-sm font-medium text-restaurant-dark">Cardápio Semanal</p>
+                </a>
+
+                <a href="lemenu-avaliar-refeicao.html" class="bg-white p-4 rounded-lg shadow hover:shadow-lg transition-shadow text-center group">
+                    <svg class="w-8 h-8 mx-auto mb-2 text-restaurant-green group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                    </svg>
+                    <p class="text-sm font-medium text-restaurant-dark">Avaliar Refeição</p>
+                </a>
+
+                <button class="bg-white p-4 rounded-lg shadow hover:shadow-lg transition-shadow text-center group">
+                    <svg class="w-8 h-8 mx-auto mb-2 text-restaurant-accent group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"/>
+                    </svg>
+                    <p class="text-sm font-medium text-restaurant-dark">Fazer Reserva</p>
+                </button>
+
+                <a href="lemenu-gestao-avisos.html" class="bg-white p-4 rounded-lg shadow hover:shadow-lg transition-shadow text-center group">
+                    <svg class="w-8 h-8 mx-auto mb-2 text-restaurant-secondary group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z"/>
+                    </svg>
+                    <p class="text-sm font-medium text-restaurant-dark">Informações</p>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-restaurant-dark text-white py-8 mt-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div>
+                    <div class="flex items-center space-x-2 mb-3">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                            <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                            <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 1 1 0 000 2H6a2 2 0 100 4h2a2 2 0 100-4h-.5a1 1 0 000-2H8a2 2 0 012-2h2a2 2 0 012 2v9a2 2 0 01-2 2H6a2 2 0 01-2-2V5z"/>
+                        </svg>
+                        <h3 class="text-xl font-bold">Le Menu</h3>
+                    </div>
+                    <p class="text-sm text-gray-300">Sistema de Gestão do Restaurante Universitário UNIFESSPA</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-3">Links Rápidos</h4>
+                    <ul class="space-y-2 text-sm text-gray-300">
+                        <li><a href="lemenu-consulta-cardapio.html" class="hover:text-white transition-colors">Cardápio</a></li>
+                        <li><a href="lemenu-avaliar-refeicao.html" class="hover:text-white transition-colors">Avaliar Refeição</a></li>
+                        <li><a href="lemenu-consultar-avaliacoes.html" class="hover:text-white transition-colors">Ver Avaliações</a></li>
+                        <li><a href="lemenu-gestao-avisos.html" class="hover:text-white transition-colors">Avisos</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-3">Contato</h4>
+                    <ul class="space-y-2 text-sm text-gray-300">
+                        <li><i class="fas fa-phone mr-2" aria-hidden="true"></i> (94) 2101-7100</li>
+                        <li><i class="fas fa-envelope mr-2" aria-hidden="true"></i> ru@unifesspa.edu.br</li>
+                        <li><i class="fas fa-clock mr-2" aria-hidden="true"></i> Seg-Sex: 6:30 - 20:00</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-3">Siga-nos</h4>
+                    <div class="flex space-x-3">
+                        <a href="#" class="bg-white/20 hover:bg-white/30 w-10 h-10 rounded-lg flex items-center justify-center transition-colors" aria-label="Facebook">
+                            <i class="fab fa-facebook-f" aria-hidden="true"></i>
+                        </a>
+                        <a href="#" class="bg-white/20 hover:bg-white/30 w-10 h-10 rounded-lg flex items-center justify-center transition-colors" aria-label="Instagram">
+                            <i class="fab fa-instagram" aria-hidden="true"></i>
+                        </a>
+                        <a href="#" class="bg-white/20 hover:bg-white/30 w-10 h-10 rounded-lg flex items-center justify-center transition-colors" aria-label="Twitter">
+                            <i class="fab fa-twitter" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-6 pt-6 text-center text-sm text-gray-400">
+                <p>&copy; 2024 Le Menu - Restaurante Universitário UNIFESSPA. Todos os direitos reservados.</p>
+                <p class="mt-2">Desenvolvido com <i class="fas fa-heart text-red-500" aria-hidden="true"></i> para nossa comunidade acadêmica</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // Atualizar data atual
+        function updateDate() {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const today = new Date();
+            const dateString = today.toLocaleDateString('pt-BR', options);
+            document.getElementById('currentDate').textContent = dateString.charAt(0).toUpperCase() + dateString.slice(1);
+        }
+
+        // Simular login
+        function handleLogin() {
+            alert('Redirecionando para o portal de autenticação UNIFESSPA...');
+            // Aqui seria o redirecionamento para o Keycloak
+            // window.location.href = 'https://sso.unifesspa.edu.br/auth/...';
+        }
+
+        // Adicionar animação ao scroll
+        function animateOnScroll() {
+            const elements = document.querySelectorAll('.menu-card, section');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('fade-in');
+                    }
+                });
+            });
+
+            elements.forEach(el => observer.observe(el));
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', () => {
+            updateDate();
+            // Fechar menu móvel ao clicar fora
+            document.addEventListener('click', (e) => {
+                const mobileMenu = document.getElementById('mobile-menu');
+                const button = document.getElementById('mobile-menu-button');
+                if (!mobileMenu || !button) return;
+                if (!button.contains(e.target) && !mobileMenu.contains(e.target)) {
+                    mobileMenu.classList.add('hidden');
+                    button.setAttribute('aria-expanded', 'false');
+                    button.setAttribute('aria-label', 'Abrir menu de navegação');
+                    const icon = button.querySelector('svg');
+                    if (icon) icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>';
+                }
+            });
+
+            animateOnScroll();
+
+            // Simular atualização de pratos a cada 30 segundos
+            setInterval(() => {
+                const cards = document.querySelectorAll('.menu-card');
+                cards.forEach(card => {
+
+
+                    card.style.animation = 'none';
+                    setTimeout(() => {
+                        card.style.animation = '';
+                    }, 10);
+                });
+            }, 30000);
+        });
+
+        // Toggle mobile menu
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            const button = document.getElementById('mobile-menu-button');
+            if (!mobileMenu || !button) return;
+            const isExpanded = button.getAttribute('aria-expanded') === 'true';
+
+            mobileMenu.classList.toggle('hidden');
+            button.setAttribute('aria-expanded', (!isExpanded).toString());
+
+            const icon = button.querySelector('svg');
+            if (isExpanded) {
+                if (icon) icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>';
+                button.setAttribute('aria-label', 'Abrir menu de navegação');
+            } else {
+                if (icon) icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>';
+                button.setAttribute('aria-label', 'Fechar menu de navegação');
+            }
+        }
+
+        // Simular logout
+        function handleLogout() {
+            alert('Logout realizado com sucesso!');
+            window.location.reload();
+        }
+
+
+        // Adicionar efeito de hover nos botões de ação rápida
+        document.querySelectorAll('button').forEach(button => {
+            button.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px)';
+            });
+            button.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
+</body>
+</html>

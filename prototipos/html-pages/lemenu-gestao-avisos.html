@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Le Menu - Gestão de Avisos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'roboto': ['Roboto', 'sans-serif'],
+                    },
+                    colors: {
+                        'restaurant': {
+                            'primary': '#8B4513',
+                            'secondary': '#D2691E',
+                            'accent': '#FF6B35',
+                            'light': '#FFF5E6',
+                            'green': '#4A7C59',
+                            'dark': '#3E2723'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .notice-card {
+            transition: all 0.3s ease;
+        }
+        .notice-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        .priority-urgent {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 107, 53, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 107, 53, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 107, 53, 0); }
+        }
+    </style>
+</head>
+<body class="bg-restaurant-light">
+    <!-- Header -->
+    <header class="bg-white shadow-md sticky top-0 z-50" role="banner">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <a href="index.html" class="flex items-center space-x-2" aria-label="Página inicial">
+                    <svg class="w-8 h-8 text-restaurant-primary" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                        <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                        <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 1 1 0 000 2H6a2 2 0 100 4h2a2 2 0 100-4h-.5a1 1 0 000-2H8a2 2 0 012-2h2a2 2 0 012 2v9a2 2 0 01-2 2H6a2 2 0 01-2-2V5z"/>
+                    </svg>
+                    <h1 class="text-xl md:text-2xl font-bold text-restaurant-dark">Le Menu</h1>
+                </a>
+                <nav class="hidden md:flex items-center space-x-6" role="navigation" aria-label="Menu principal">
+                    <a href="lemenu-consulta-cardapio.html" class="text-gray-600 hover:text-restaurant-primary transition-colors" id="nav-cardapio">Cardápio</a>
+                    <a href="lemenu-gestao-avisos.html" class="text-restaurant-primary font-medium" aria-current="page" id="nav-avisos">Avisos</a>
+                    <a href="lemenu-consultar-avaliacoes.html" class="text-gray-600 hover:text-restaurant-primary transition-colors" id="nav-avaliacoes">Avaliações</a>
+                </nav>
+                <!-- Mobile menu button -->
+                <button class="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                        onclick="toggleMobileMenu()"
+                        aria-label="Abrir menu de navegação"
+                        aria-expanded="false"
+                        aria-controls="mobile-menu"
+                        id="mobile-menu-button">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+                <div class="hidden md:flex items-center space-x-3">
+                    <span class="text-sm text-gray-600">Gestor: Maria Silva</span>
+                    <div class="relative">
+                        <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors" aria-label="Notificações (1 nova)">
+                            <i class="fas fa-bell text-gray-600" aria-hidden="true"></i>
+                            <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                    <button onclick="handleLogout()" class="p-2 hover:bg-gray-100 rounded-lg transition-colors" aria-label="Sair do sistema">
+                        <i class="fas fa-sign-out-alt text-restaurant-primary" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </div>
+            <!-- Mobile Navigation Menu -->
+            <div class="md:hidden hidden mt-4 pb-4 border-t" id="mobile-menu" role="navigation" aria-label="Menu de navegação móvel">
+                <div class="flex flex-col space-y-2 mt-4">
+                    <a href="lemenu-consulta-cardapio.html" class="block py-2 px-4 text-gray-600 hover:text-restaurant-primary hover:bg-gray-50 rounded-lg transition-colors">Cardápio</a>
+                    <a href="lemenu-gestao-avisos.html" class="block py-2 px-4 text-restaurant-primary font-medium rounded-lg bg-restaurant-light" aria-current="page">Avisos</a>
+                    <a href="lemenu-consultar-avaliacoes.html" class="block py-2 px-4 text-gray-600 hover:text-restaurant-primary hover:bg-gray-50 rounded-lg transition-colors">Avaliações</a>
+                    <div class="mt-2 pt-2 border-t border-gray-200">
+                        <span class="block py-2 px-4 text-sm text-gray-600">Gestor: Maria Silva</span>
+                        <button class="w-full text-left py-2 px-4 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
+                            <i class="fas fa-bell mr-2" aria-hidden="true"></i>Notificações <span class="ml-1 bg-red-500 text-white text-xs px-1 rounded-full">1</span>
+                        </button>
+                        <button onclick="handleLogout()" class="w-full text-left py-2 px-4 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                            <i class="fas fa-sign-out-alt mr-2" aria-hidden="true"></i>Sair
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navegação Breadcrumb -->
+    <nav class="bg-white border-b" aria-label="Breadcrumb">
+        <div class="container mx-auto px-4 py-2">
+            <ol class="flex items-center space-x-2 text-sm">
+                <li>
+                    <a href="index.html" class="text-gray-500 hover:text-restaurant-primary transition-colors">
+                        <i class="fas fa-home" aria-hidden="true"></i>
+                        <span class="sr-only">Início</span>
+                    </a>
+                </li>
+                <li>
+                    <span class="text-gray-400 mx-2">/</span>
+                </li>
+                <li>
+                    <span class="text-restaurant-primary font-medium" aria-current="page">Gestão de Avisos</span>
+                </li>
+            </ol>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-6">
+        <!-- Cabeçalho da Página -->
+        <div class="mb-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-restaurant-dark">Gestão de Avisos</h2>
+                    <p class="text-gray-600 mt-1">Gerencie avisos e comunicados para a comunidade</p>
+                </div>
+                <button onclick="openNewNoticeModal()" class="bg-restaurant-primary hover:bg-restaurant-dark text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2">
+                    <i class="fas fa-plus"></i>
+                    <span>Novo Aviso</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Estatísticas Rápidas -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div class="bg-white rounded-lg p-4 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Avisos Ativos</p>
+                        <p class="text-2xl font-bold text-restaurant-dark">12</p>
+                    </div>
+                    <div class="bg-green-100 p-3 rounded-lg">
+                        <i class="fas fa-bullhorn text-green-600"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg p-4 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Urgentes</p>
+                        <p class="text-2xl font-bold text-restaurant-accent">3</p>
+                    </div>
+                    <div class="bg-red-100 p-3 rounded-lg">
+                        <i class="fas fa-exclamation-triangle text-red-600"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg p-4 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Expirando Hoje</p>
+                        <p class="text-2xl font-bold text-yellow-600">2</p>
+                    </div>
+                    <div class="bg-yellow-100 p-3 rounded-lg">
+                        <i class="fas fa-clock text-yellow-600"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg p-4 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Rascunhos</p>
+                        <p class="text-2xl font-bold text-gray-600">5</p>
+                    </div>
+                    <div class="bg-gray-100 p-3 rounded-lg">
+                        <i class="fas fa-file-alt text-gray-600"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtros e Busca -->
+        <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
+            <div class="flex flex-col lg:flex-row gap-4">
+                <div class="flex-1">
+                    <div class="relative">
+                        <input type="text"
+                               id="search-notices"
+                               name="search-notices"
+                               placeholder="Buscar avisos..."
+                               aria-label="Buscar avisos"
+                               class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-restaurant-primary focus:border-transparent">
+                        <i class="fas fa-search absolute left-3 top-3 text-gray-400" aria-hidden="true"></i>
+                    </div>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <select id="filter-status"
+                            name="filter-status"
+                            aria-label="Filtrar por status"
+                            class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-restaurant-primary focus:border-transparent">
+                        <option value="">Todos os Status</option>
+                        <option value="ativo">Ativo</option>
+                        <option value="expirado">Expirado</option>
+                        <option value="rascunho">Rascunho</option>
+                    </select>
+                    <select id="filter-priority"
+                            name="filter-priority"
+                            aria-label="Filtrar por prioridade"
+                            class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-restaurant-primary focus:border-transparent">
+                        <option value="">Todas as Prioridades</option>
+                        <option value="urgente">Urgente</option>
+                        <option value="normal">Normal</option>
+                    </select>
+                    <button type="button"
+                            aria-label="Aplicar filtros"
+                            class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
+                        <i class="fas fa-filter mr-2" aria-hidden="true"></i>Filtrar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de Avisos -->
+        <div class="space-y-4">
+            <!-- Aviso Urgente -->
+            <div class="notice-card bg-white rounded-lg shadow-sm overflow-hidden border-l-4 border-red-500 priority-urgent">
+                <div class="p-4">
+                    <div class="flex flex-col lg:flex-row justify-between">
+                        <div class="flex-1">
+                            <div class="flex items-start gap-3">
+                                <div class="bg-red-100 p-2 rounded-lg mt-1">
+                                    <i class="fas fa-exclamation-circle text-red-600"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <h3 class="font-bold text-lg text-restaurant-dark">Manutenção no Sistema de Reservas</h3>
+                                        <span class="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-medium">URGENTE</span>
+                                        <span class="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-medium">ATIVO</span>
+                                    </div>
+                                    <p class="text-gray-600 mb-3">O sistema de reservas estará em manutenção das 22h às 6h. Durante este período, não será possível fazer ou cancelar reservas.</p>
+                                    <div class="flex flex-wrap items-center gap-4 text-sm text-gray-500">
+                                        <span><i class="fas fa-calendar-alt mr-1"></i> Publicado: 28/09/2024</span>
+                                        <span><i class="fas fa-hourglass-end mr-1"></i> Expira: 30/09/2024</span>
+                                        <span><i class="fas fa-eye mr-1"></i> 1.234 visualizações</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-2 mt-4 lg:mt-0">
+                            <button onclick="editNotice(1)" class="p-2 hover:bg-gray-100 rounded-lg transition-colors" title="Editar">
+                                <i class="fas fa-edit text-gray-600"></i>
+                            </button>
+                            <button onclick="duplicateNotice(1)" class="p-2 hover:bg-gray-100 rounded-lg transition-colors" title="Duplicar">
+                                <i class="fas fa-copy text-gray-600"></i>
+                            </button>
+                            <button onclick="toggleNoticeStatus(1)" class="p-2 hover:bg-gray-100 rounded-lg transition-colors" title="Desativar">
+                                <i class="fas fa-toggle-on text-green-600"></i>
+                            </button>
+                            <button onclick="deleteNotice(1)" class="p-2 hover:bg-gray-100 rounded-lg transition-colors" title="Excluir">
+                                <i class="fas fa-trash text-red-600"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Aviso Normal Ativo -->
+            <div class="notice-card bg-white rounded-lg shadow-sm overflow-hidden border-l-4 border-green-500">
+                <div class="p-4">
+                    <div class="flex flex-col lg:flex-row justify-between">
+                        <div class="flex-1">
+                            <div class="flex items-start gap-3">
+                                <div class="bg-blue-100 p-2 rounded-lg mt-1">
+                                    <i class="fas fa-info-circle text-blue-600"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <h3 class="font-bold text-lg text-restaurant-dark">Novo Cardápio Vegetariano</h3>
+                                        <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs font-medium">NORMAL</span>
+                                        <span class="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-medium">ATIVO</span>
+                                    </div>
+                                    <p class="text-gray-600 mb-3">A partir de segunda-feira, teremos novas opções vegetarianas no cardápio do almoço. Venha experimentar!</p>
+                                    <div class="flex flex-wrap items-center gap-4 text-sm text-gray-500">
+                                        <span><i class="fas fa-calendar-alt mr-1"></i> Publicado: 27/09/2024</span>
+                                        <span><i class="fas fa-hourglass-end mr-1"></i> Expira: 05/10/2024</span>
+                                        <span><i class="fas fa-eye mr-1"></i> 856 visualizações</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-2 mt-4 lg:mt-0">
+                            <button onclick="editNotice(2)" class="p-2 hover:bg-gray-100 rounded-lg transition-colors" title="Editar">
+                                <i class="fas fa-edit text-gray-600"></i>
+                            </button>
+                            <button onclick="duplicateNotice(2)" class="p-2 hover:bg-gray-100 rounded-lg transition-colors" title="Duplicar">
+                                <i class="fas fa-copy text-gray-600"></i>
+                            </button>
+                            <button onclick="toggleNoticeStatus(2)" class="p-2 hover:bg-gray-100 rounded-lg transition-colors" title="Desativar">
+                                <i class="fas fa-toggle-on text-green-600"></i>
+                            </button>
+                            <button onclick="deleteNotice(2)" class="p-2 hover:bg-gray-100 rounded-lg transition-colors" title="Excluir">
+                                <i class="fas fa-trash text-red-600"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Aviso Expirando Hoje -->
+            <div class="notice-card bg-white rounded-lg shadow-sm overflow-hidden border-l-4 border-yellow-500">
+                <div class="p-4">
+                    <div class="flex flex-col lg:flex-row justify-between">
+                        <div class="flex-1">
+                            <div class="flex items-start gap-3">
+                                <div class="bg-yellow-100 p-2 rounded-lg mt-1">
+                                    <i class="fas fa-calendar-times text-yellow-600"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <h3 class="font-bold text-lg text-restaurant-dark">Horário Especial - Feriado</h3>
+                                        <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs font-medium">NORMAL</span>
+                                        <span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full text-xs font-medium">EXPIRANDO HOJE</span>
+                                    </div>
+                                    <p class="text-gray-600 mb-3">Amanhã, feriado de 30/09, o RU funcionará em horário especial: apenas almoço das 11h às 13h.</p>
+                                    <div class="flex flex-wrap items-center gap-4 text-sm text-gray-500">
+                                        <span><i class="fas fa-calendar-alt mr-1"></i> Publicado: 25/09/2024</span>
+                                        <span class="text-yellow-600 font-medium"><i class="fas fa-hourglass-end mr-1"></i> Expira hoje às 23:59</span>
+                                        <span><i class="fas fa-eye mr-1"></i> 2.145 visualizações</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-2 mt-4 lg:mt-0">
+                            <button onclick="extendNotice(3)" class="p-2 hover:bg-gray-100 rounded-lg transition-colors" title="Estender Prazo">
+                                <i class="fas fa-clock text-yellow-600"></i>
+                            </button>
+                            <button onclick="editNotice(3)" class="p-2 hover:bg-gray-100 rounded-lg transition-colors" title="Editar">
+                                <i class="fas fa-edit text-gray-600"></i>
+                            </button>
+                            <button onclick="toggleNoticeStatus(3)" class="p-2 hover:bg-gray-100 rounded-lg transition-colors" title="Desativar">
+                                <i class="fas fa-toggle-on text-green-600"></i>
+                            </button>
+                            <button onclick="deleteNotice(3)" class="p-2 hover:bg-gray-100 rounded-lg transition-colors" title="Excluir">
+                                <i class="fas fa-trash text-red-600"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Aviso Rascunho -->
+            <div class="notice-card bg-white rounded-lg shadow-sm overflow-hidden border-l-4 border-gray-400 opacity-75">
+                <div class="p-4">
+                    <div class="flex flex-col lg:flex-row justify-between">
+                        <div class="flex-1">
+                            <div class="flex items-start gap-3">
+                                <div class="bg-gray-100 p-2 rounded-lg mt-1">
+                                    <i class="fas fa-file-alt text-gray-600"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <h3 class="font-bold text-lg text-gray-600">Campanha de Redução de Desperdício</h3>
+                                        <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs font-medium">RASCUNHO</span>
+                                    </div>
+                                    <p class="text-gray-500 mb-3">Participe da nossa campanha de conscientização sobre desperdício de alimentos. Juntos podemos fazer a diferença!</p>
+                                    <div class="flex flex-wrap items-center gap-4 text-sm text-gray-500">
+                                        <span><i class="fas fa-calendar-alt mr-1"></i> Criado: 26/09/2024</span>
+                                        <span><i class="fas fa-edit mr-1"></i> Última edição: há 2 horas</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-2 mt-4 lg:mt-0">
+                            <button onclick="publishNotice(4)" class="px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors text-sm">
+                                <i class="fas fa-paper-plane mr-1"></i> Publicar
+                            </button>
+                            <button onclick="editNotice(4)" class="p-2 hover:bg-gray-100 rounded-lg transition-colors" title="Editar">
+                                <i class="fas fa-edit text-gray-600"></i>
+                            </button>
+                            <button onclick="deleteNotice(4)" class="p-2 hover:bg-gray-100 rounded-lg transition-colors" title="Excluir">
+                                <i class="fas fa-trash text-red-600"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Paginação -->
+        <div class="flex justify-center mt-8">
+            <nav class="flex items-center space-x-1">
+                <button class="px-3 py-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="px-3 py-2 bg-restaurant-primary text-white rounded-lg">1</button>
+                <button class="px-3 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">2</button>
+                <button class="px-3 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">3</button>
+                <button class="px-3 py-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Modal Criar/Editar Aviso -->
+    <div id="noticeModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="sticky top-0 bg-white border-b p-4 flex justify-between items-center">
+                <h3 class="text-xl font-bold text-restaurant-dark" id="modalTitle">Novo Aviso</h3>
+                <button onclick="closeNoticeModal()" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                    <i class="fas fa-times text-gray-500"></i>
+                </button>
+            </div>
+            
+            <form id="noticeForm" class="p-6 space-y-4">
+                <!-- Título -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Título do Aviso *</label>
+                    <input type="text" id="noticeTitle" required maxlength="100"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-restaurant-primary focus:border-transparent">
+                    <p class="text-xs text-gray-500 mt-1">Máximo 100 caracteres</p>
+                </div>
+
+                <!-- Conteúdo -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Conteúdo *</label>
+                    <textarea id="noticeContent" required rows="4" maxlength="500"
+                              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-restaurant-primary focus:border-transparent"></textarea>
+                    <p class="text-xs text-gray-500 mt-1">Máximo 500 caracteres</p>
+                </div>
+
+                <!-- Prioridade e Datas -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Prioridade *</label>
+                        <select id="noticePriority" required
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-restaurant-primary focus:border-transparent">
+                            <option value="normal">Normal</option>
+                            <option value="urgente">Urgente</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Data de Expiração</label>
+                        <input type="datetime-local" id="noticeExpiry"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-restaurant-primary focus:border-transparent">
+                    </div>
+                </div>
+
+                <!-- Canais de Divulgação -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Canais de Divulgação</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center">
+                            <input type="checkbox" checked class="mr-2 text-restaurant-primary focus:ring-restaurant-primary">
+                            <span class="text-sm">Página inicial do sistema</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" class="mr-2 text-restaurant-primary focus:ring-restaurant-primary">
+                            <span class="text-sm">Enviar notificação push</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" class="mr-2 text-restaurant-primary focus:ring-restaurant-primary">
+                            <span class="text-sm">Enviar por e-mail</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Preview -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Preview</label>
+                    <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                        <div class="flex items-start gap-3">
+                            <div class="bg-blue-100 p-2 rounded-lg">
+                                <i class="fas fa-info-circle text-blue-600"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-restaurant-dark" id="previewTitle">Título do aviso aparecerá aqui</h4>
+                                <p class="text-gray-600 mt-1" id="previewContent">O conteúdo do aviso será exibido aqui...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botões -->
+                <div class="flex justify-end gap-3 pt-4 border-t">
+                    <button type="button" onclick="saveAsDraft()" 
+                            class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg transition-colors">
+                        <i class="fas fa-save mr-2"></i>Salvar Rascunho
+                    </button>
+                    <button type="button" onclick="closeNoticeModal()" 
+                            class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors">
+                        Cancelar
+                    </button>
+                    <button type="submit" 
+                            class="px-4 py-2 bg-restaurant-primary hover:bg-restaurant-dark text-white rounded-lg transition-colors">
+                        <i class="fas fa-paper-plane mr-2"></i>Publicar Aviso
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast de Notificação -->
+    <div id="toast" class="fixed bottom-4 right-4 hidden z-50">
+        <div class="bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg flex items-center space-x-3 slide-in">
+            <i class="fas fa-check-circle"></i>
+            <span id="toastMessage">Aviso publicado com sucesso!</span>
+        </div>
+    </div>
+
+    <script>
+        // Estado da aplicação
+        let notices = [
+            {
+                id: 1,
+                title: 'Manutenção no Sistema de Reservas',
+                content: 'O sistema de reservas estará em manutenção das 22h às 6h.',
+                priority: 'urgente',
+                status: 'ativo',
+                publishedAt: '2024-09-28',
+                expiresAt: '2024-09-30',
+                views: 1234
+            },
+            {
+                id: 2,
+                title: 'Novo Cardápio Vegetariano',
+                content: 'A partir de segunda-feira, teremos novas opções vegetarianas.',
+                priority: 'normal',
+                status: 'ativo',
+                publishedAt: '2024-09-27',
+                expiresAt: '2024-10-05',
+                views: 856
+            }
+        ];
+
+        // Preview em tempo real
+        document.getElementById('noticeTitle').addEventListener('input', function(e) {
+            document.getElementById('previewTitle').textContent = e.target.value || 'Título do aviso aparecerá aqui';
+        });
+
+        document.getElementById('noticeContent').addEventListener('input', function(e) {
+            document.getElementById('previewContent').textContent = e.target.value || 'O conteúdo do aviso será exibido aqui...';
+        });
+
+        // Abrir modal de novo aviso
+        function openNewNoticeModal() {
+            document.getElementById('modalTitle').textContent = 'Novo Aviso';
+            document.getElementById('noticeForm').reset();
+            document.getElementById('previewTitle').textContent = 'Título do aviso aparecerá aqui';
+            document.getElementById('previewContent').textContent = 'O conteúdo do aviso será exibido aqui...';
+            document.getElementById('noticeModal').classList.remove('hidden');
+        }
+
+        // Fechar modal
+        function closeNoticeModal() {
+            document.getElementById('noticeModal').classList.add('hidden');
+        }
+
+        // Editar aviso
+        function editNotice(id) {
+            const notice = notices.find(n => n.id === id);
+            if (notice) {
+                document.getElementById('modalTitle').textContent = 'Editar Aviso';
+                document.getElementById('noticeTitle').value = notice.title;
+                document.getElementById('noticeContent').value = notice.content;
+                document.getElementById('noticePriority').value = notice.priority;
+                document.getElementById('previewTitle').textContent = notice.title;
+                document.getElementById('previewContent').textContent = notice.content;
+                document.getElementById('noticeModal').classList.remove('hidden');
+            }
+        }
+
+        // Duplicar aviso
+        function duplicateNotice(id) {
+            const notice = notices.find(n => n.id === id);
+            if (notice) {
+                document.getElementById('modalTitle').textContent = 'Duplicar Aviso';
+                document.getElementById('noticeTitle').value = notice.title + ' (Cópia)';
+                document.getElementById('noticeContent').value = notice.content;
+                document.getElementById('noticePriority').value = notice.priority;
+                document.getElementById('noticeModal').classList.remove('hidden');
+            }
+        }
+
+        // Alternar status
+        function toggleNoticeStatus(id) {
+            showToast('Status do aviso alterado!');
+        }
+
+        // Excluir aviso
+        function deleteNotice(id) {
+            if (confirm('Deseja realmente excluir este aviso?')) {
+                showToast('Aviso excluído com sucesso!');
+            }
+        }
+
+        // Estender prazo
+        function extendNotice(id) {
+            const newDate = prompt('Nova data de expiração (DD/MM/AAAA):');
+            if (newDate) {
+                showToast('Prazo do aviso estendido!');
+            }
+        }
+
+        // Publicar rascunho
+        function publishNotice(id) {
+            if (confirm('Deseja publicar este aviso agora?')) {
+                showToast('Aviso publicado com sucesso!');
+            }
+        }
+
+        // Salvar como rascunho
+        function saveAsDraft() {
+            showToast('Aviso salvo como rascunho!');
+            closeNoticeModal();
+        }
+
+        // Submeter formulário
+        document.getElementById('noticeForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            showToast('Aviso publicado com sucesso!');
+            closeNoticeModal();
+        });
+
+        // Mostrar toast
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').textContent = message;
+            toast.classList.remove('hidden');
+            
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+
+        // Toggle mobile menu
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            const button = document.getElementById('mobile-menu-button');
+            const isExpanded = button.getAttribute('aria-expanded') === 'true';
+
+            mobileMenu.classList.toggle('hidden');
+            button.setAttribute('aria-expanded', !isExpanded);
+
+            // Update button icon
+            const icon = button.querySelector('svg');
+            if (isExpanded) {
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>';
+                button.setAttribute('aria-label', 'Abrir menu de navegação');
+            } else {
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>';
+                button.setAttribute('aria-label', 'Fechar menu de navegação');
+            }
+        }
+
+        // Logout
+        function handleLogout() {
+            if (confirm('Deseja sair do sistema?')) {
+                window.location.href = '/';
+            }
+        }
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', () => {
+            // Adicionar animações aos cards
+            const cards = document.querySelectorAll('.notice-card');
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.classList.add('fade-in');
+                }, index * 100);
+            });
+
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', (e) => {
+                const mobileMenu = document.getElementById('mobile-menu');
+                const button = document.getElementById('mobile-menu-button');
+
+                if (!button.contains(e.target) && !mobileMenu.contains(e.target)) {
+                    mobileMenu.classList.add('hidden');
+                    button.setAttribute('aria-expanded', 'false');
+                    button.setAttribute('aria-label', 'Abrir menu de navegação');
+                    const icon = button.querySelector('svg');
+                    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>';
+                }
+            });
+        });
+    </script>
+
+    <!-- Footer -->
+    <footer class="bg-restaurant-dark text-white py-8 mt-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div>
+                    <div class="flex items-center space-x-2 mb-3">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                            <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                            <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 1 1 0 000 2H6a2 2 0 100 4h2a2 2 0 100-4h-.5a1 1 0 000-2H8a2 2 0 012-2h2a2 2 0 012 2v9a2 2 0 01-2 2H6a2 2 0 01-2-2V5z"/>
+                        </svg>
+                        <h3 class="text-xl font-bold">Le Menu</h3>
+                    </div>
+                    <p class="text-sm text-gray-300">Sistema de Gestão do Restaurante Universitário UNIFESSPA</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-3">Links Rápidos</h4>
+                    <ul class="space-y-2 text-sm text-gray-300">
+                        <li><a href="lemenu-consulta-cardapio.html" class="hover:text-white transition-colors">Cardápio</a></li>
+                        <li><a href="lemenu-avaliar-refeicao.html" class="hover:text-white transition-colors">Avaliar Refeição</a></li>
+                        <li><a href="lemenu-consultar-avaliacoes.html" class="hover:text-white transition-colors">Ver Avaliações</a></li>
+                        <li><a href="lemenu-gestao-avisos.html" class="hover:text-white transition-colors">Avisos</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-3">Contato</h4>
+                    <ul class="space-y-2 text-sm text-gray-300">
+                        <li><i class="fas fa-phone mr-2" aria-hidden="true"></i> (94) 2101-7100</li>
+                        <li><i class="fas fa-envelope mr-2" aria-hidden="true"></i> ru@unifesspa.edu.br</li>
+                        <li><i class="fas fa-clock mr-2" aria-hidden="true"></i> Seg-Sex: 6:30 - 20:00</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-3">Siga-nos</h4>
+                    <div class="flex space-x-3">
+                        <a href="#" class="bg-white/20 hover:bg-white/30 w-10 h-10 rounded-lg flex items-center justify-center transition-colors" aria-label="Facebook">
+                            <i class="fab fa-facebook-f" aria-hidden="true"></i>
+                        </a>
+                        <a href="#" class="bg-white/20 hover:bg-white/30 w-10 h-10 rounded-lg flex items-center justify-center transition-colors" aria-label="Instagram">
+                            <i class="fab fa-instagram" aria-hidden="true"></i>
+                        </a>
+                        <a href="#" class="bg-white/20 hover:bg-white/30 w-10 h-10 rounded-lg flex items-center justify-center transition-colors" aria-label="Twitter">
+                            <i class="fab fa-twitter" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-6 pt-6 text-center text-sm text-gray-400">
+                <p>&copy; 2024 Le Menu - Restaurante Universitário UNIFESSPA. Todos os direitos reservados.</p>
+                <p class="mt-2">Desenvolvido com <i class="fas fa-heart text-red-500" aria-hidden="true"></i> para nossa comunidade acadêmica</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

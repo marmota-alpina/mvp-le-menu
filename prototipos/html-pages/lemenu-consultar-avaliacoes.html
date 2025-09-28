@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Le Menu - Consultar Avaliações</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'roboto': ['Roboto', 'sans-serif'],
+                    },
+                    colors: {
+                        'restaurant': {
+                            'primary': '#8B4513',
+                            'secondary': '#D2691E',
+                            'accent': '#FF6B35',
+                            'light': '#FFF5E6',
+                            'green': '#4A7C59',
+                            'dark': '#3E2723'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        main {
+            flex: 1;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .review-card {
+            transition: all 0.3s ease;
+        }
+        .review-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        .highlight {
+            background-color: #FFD700;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    </style>
+</head>
+<body class="bg-restaurant-light">
+    <!-- Header -->
+    <header class="bg-white shadow-md sticky top-0 z-50" role="banner">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <a href="index.html" class="flex items-center space-x-2" aria-label="Página inicial">
+                    <svg class="w-8 h-8 text-restaurant-primary" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                        <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                        <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 1 1 0 000 2H6a2 2 0 100 4h2a2 2 0 100-4h-.5a1 1 0 000-2H8a2 2 0 012-2h2a2 2 0 012 2v9a2 2 0 01-2 2H6a2 2 0 01-2-2V5z"/>
+                    </svg>
+                    <h1 class="text-xl md:text-2xl font-bold text-restaurant-dark">Le Menu</h1>
+                </a>
+                <nav class="hidden md:flex items-center space-x-6" role="navigation" aria-label="Menu principal">
+                    <a href="lemenu-consulta-cardapio.html" class="text-gray-600 hover:text-restaurant-primary transition-colors" id="nav-cardapio">Cardápio</a>
+                    <a href="lemenu-gestao-avisos.html" class="text-gray-600 hover:text-restaurant-primary transition-colors" id="nav-avisos">Avisos</a>
+                    <a href="lemenu-consultar-avaliacoes.html" class="text-restaurant-primary font-medium" aria-current="page" id="nav-avaliacoes">Avaliações</a>
+                </nav>
+                <!-- Mobile menu button -->
+                <button class="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                        onclick="toggleMobileMenu()"
+                        aria-label="Abrir menu de navegação"
+                        aria-expanded="false"
+                        aria-controls="mobile-menu"
+                        id="mobile-menu-button">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+                <div class="hidden md:flex items-center space-x-3">
+                    <span class="text-sm text-gray-600">Olá, João Silva</span>
+                    <button onclick="handleLogout()" class="p-2 hover:bg-gray-100 rounded-lg transition-colors" aria-label="Sair do sistema">
+                        <i class="fas fa-sign-out-alt text-restaurant-primary"></i>
+                    </button>
+                </div>
+            </div>
+            <!-- Mobile Navigation Menu -->
+            <div class="md:hidden hidden mt-4 pb-4 border-t" id="mobile-menu" role="navigation" aria-label="Menu de navegação móvel">
+                <div class="flex flex-col space-y-2 mt-4">
+                    <a href="lemenu-consulta-cardapio.html" class="block py-2 px-4 text-gray-600 hover:text-restaurant-primary hover:bg-gray-50 rounded-lg transition-colors">Cardápio</a>
+                    <a href="lemenu-gestao-avisos.html" class="block py-2 px-4 text-gray-600 hover:text-restaurant-primary hover:bg-gray-50 rounded-lg transition-colors">Avisos</a>
+                    <a href="lemenu-consultar-avaliacoes.html" class="block py-2 px-4 text-restaurant-primary font-medium rounded-lg bg-restaurant-light" aria-current="page">Avaliações</a>
+                    <div class="mt-2 pt-2 border-t border-gray-200">
+                        <span class="block py-2 px-4 text-sm text-gray-600">Olá, João Silva</span>
+                        <button onclick="handleLogout()" class="w-full text-left py-2 px-4 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                            <i class="fas fa-sign-out-alt mr-2"></i>Sair
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navegação Breadcrumb -->
+    <nav class="bg-white border-b" aria-label="Breadcrumb">
+        <div class="container mx-auto px-4 py-2">
+            <ol class="flex items-center space-x-2 text-sm">
+                <li>
+                    <a href="index.html" class="text-gray-500 hover:text-restaurant-primary transition-colors">
+                        <i class="fas fa-home" aria-hidden="true"></i>
+                        <span class="sr-only">Início</span>
+                    </a>
+                </li>
+                <li>
+                    <span class="text-gray-400 mx-2">/</span>
+                </li>
+                <li>
+                    <span class="text-restaurant-primary font-medium" aria-current="page">Avaliações</span>
+                </li>
+            </ol>
+        </div>
+    </nav>
+
+    <main>
+        <div class="container mx-auto px-4 py-6">
+            <!-- Cabeçalho da Página -->
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-restaurant-dark mb-2">Avaliações das Refeições</h2>
+                <p class="text-gray-600">Veja o que a comunidade está dizendo sobre nossas refeições</p>
+            </div>
+
+            <!-- Cards de Estatísticas -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div class="bg-white rounded-lg p-4 shadow-sm fade-in">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm">Média Geral</p>
+                            <div class="flex items-center gap-2 mt-1">
+                                <span class="text-2xl font-bold text-restaurant-dark">4.3</span>
+                                <div class="flex">
+                                    <i class="fas fa-star text-yellow-500 text-sm"></i>
+                                    <i class="fas fa-star text-yellow-500 text-sm"></i>
+                                    <i class="fas fa-star text-yellow-500 text-sm"></i>
+                                    <i class="fas fa-star text-yellow-500 text-sm"></i>
+                                    <i class="fas fa-star-half-alt text-yellow-500 text-sm"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-yellow-100 p-3 rounded-lg">
+                            <i class="fas fa-star text-yellow-600"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg p-4 shadow-sm fade-in">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm">Total de Avaliações</p>
+                            <p class="text-2xl font-bold text-restaurant-dark">2,847</p>
+                        </div>
+                        <div class="bg-blue-100 p-3 rounded-lg">
+                            <i class="fas fa-comments text-blue-600"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg p-4 shadow-sm fade-in">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm">Melhor Avaliado</p>
+                            <p class="text-lg font-bold text-restaurant-dark">Feijoada</p>
+                            <div class="flex gap-0.5">
+                                <i class="fas fa-star text-yellow-500 text-xs"></i>
+                                <i class="fas fa-star text-yellow-500 text-xs"></i>
+                                <i class="fas fa-star text-yellow-500 text-xs"></i>
+                                <i class="fas fa-star text-yellow-500 text-xs"></i>
+                                <i class="fas fa-star text-yellow-500 text-xs"></i>
+                            </div>
+                        </div>
+                        <div class="bg-green-100 p-3 rounded-lg">
+                            <i class="fas fa-trophy text-green-600"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg p-4 shadow-sm fade-in">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm">Taxa de Satisfação</p>
+                            <p class="text-2xl font-bold text-restaurant-green">87%</p>
+                        </div>
+                        <div class="bg-green-100 p-3 rounded-lg">
+                            <i class="fas fa-smile text-green-600"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Coluna Principal - Lista de Avaliações -->
+                <div class="lg:col-span-2">
+                    <!-- Filtros e Busca -->
+                    <div class="bg-white rounded-lg shadow-sm p-4 mb-4">
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <div class="flex-1 relative">
+                                <input type="text" id="searchInput" placeholder="Buscar nas avaliações..."
+                                       onkeyup="searchReviews()"
+                                       class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-restaurant-primary focus:border-transparent">
+                                <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                            </div>
+                            <select id="mealFilter" onchange="filterReviews()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-restaurant-primary focus:border-transparent">
+                                <option value="">Todas as Refeições</option>
+                                <option value="cafe">Café da Manhã</option>
+                                <option value="almoco">Almoço</option>
+                                <option value="jantar">Jantar</option>
+                            </select>
+                            <select id="ratingFilter" onchange="filterReviews()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-restaurant-primary focus:border-transparent">
+                                <option value="">Todas as Notas</option>
+                                <option value="5">5 estrelas</option>
+                                <option value="4">4 estrelas</option>
+                                <option value="3">3 estrelas</option>
+                                <option value="2">2 estrelas</option>
+                                <option value="1">1 estrela</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Contador de Resultados -->
+                    <div class="flex justify-between items-center mb-4">
+                        <p class="text-gray-600"><span id="reviewCount">156</span> avaliações encontradas</p>
+                        <select class="text-sm px-3 py-1 border border-gray-300 rounded-lg">
+                            <option>Mais recentes</option>
+                            <option>Mais antigas</option>
+                            <option>Maior nota</option>
+                            <option>Menor nota</option>
+                        </select>
+                    </div>
+
+                    <!-- Lista de Avaliações -->
+                    <div class="space-y-4" id="reviewsList">
+                        <!-- Avaliação 1 -->
+                        <div class="review-card bg-white rounded-lg shadow-sm p-4 fade-in">
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="flex items-start gap-3">
+                                    <div class="bg-gray-200 w-10 h-10 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-user text-gray-600"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-800">Maria Santos</h4>
+                                        <p class="text-xs text-gray-500">Almoço - há 2 horas</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-0.5">
+                                    <i class="fas fa-star text-yellow-500"></i>
+                                    <i class="fas fa-star text-yellow-500"></i>
+                                    <i class="fas fa-star text-yellow-500"></i>
+                                    <i class="fas fa-star text-yellow-500"></i>
+                                    <i class="fas fa-star text-yellow-500"></i>
+                                </div>
+                            </div>
+                            <p class="text-gray-700 mb-3">O frango grelhado estava excelente hoje! Bem temperado e no ponto certo. A salada estava fresca e o arroz soltinho. Parabéns à equipe da cozinha!</p>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-4 text-sm text-gray-500">
+                                    <button class="hover:text-restaurant-primary transition-colors">
+                                        <i class="far fa-thumbs-up mr-1"></i> Útil (12)
+                                    </button>
+                                    <button class="hover:text-restaurant-primary transition-colors">
+                                        <i class="far fa-comment mr-1"></i> Responder
+                                    </button>
+                                </div>
+                                <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-medium">Verificado</span>
+                            </div>
+                        </div>
+
+                        <!-- Avaliação 2 -->
+                        <div class="review-card bg-white rounded-lg shadow-sm p-4 fade-in">
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="flex items-start gap-3">
+                                    <div class="bg-gray-200 w-10 h-10 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-user text-gray-600"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-800">João Pedro</h4>
+                                        <p class="text-xs text-gray-500">Almoço - há 5 horas</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-0.5">
+                                    <i class="fas fa-star text-yellow-500"></i>
+                                    <i class="fas fa-star text-yellow-500"></i>
+                                    <i class="fas fa-star text-yellow-500"></i>
+                                    <i class="fas fa-star text-gray-300"></i>
+                                    <i class="fas fa-star text-gray-300"></i>
+                                </div>
+                            </div>
+                            <p class="text-gray-700 mb-3">A comida estava boa, mas achei a porção um pouco pequena hoje. O feijão poderia estar mais temperado. No geral, satisfatório.</p>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-4 text-sm text-gray-500">
+                                    <button class="hover:text-restaurant-primary transition-colors">
+                                        <i class="far fa-thumbs-up mr-1"></i> Útil (5)
+                                    </button>
+                                    <button class="hover:text-restaurant-primary transition-colors">
+                                        <i class="far fa-comment mr-1"></i> Responder
+                                    </button>
+                                </div>
+                                <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-medium">Verificado</span>
+                            </div>
+                        </div>
+
+                        <!-- Avaliação 3 -->
+                        <div class="review-card bg-white rounded-lg shadow-sm p-4 fade-in">
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="flex items-start gap-3">
+                                    <div class="bg-gray-200 w-10 h-10 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-user text-gray-600"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-800">Ana Clara</h4>
+                                        <p class="text-xs text-gray-500">Café da Manhã - hoje</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-0.5">
+                                    <i class="fas fa-star text-yellow-500"></i>
+                                    <i class="fas fa-star text-yellow-500"></i>
+                                    <i class="fas fa-star text-yellow-500"></i>
+                                    <i class="fas fa-star text-yellow-500"></i>
+                                    <i class="fas fa-star text-gray-300"></i>
+                                </div>
+                            </div>
+                            <p class="text-gray-700 mb-3">Café da manhã muito bom! O pão estava fresquinho e o café quentinho. Só senti falta de mais opções de frutas.</p>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-4 text-sm text-gray-500">
+                                    <button class="hover:text-restaurant-primary transition-colors">
+                                        <i class="far fa-thumbs-up mr-1"></i> Útil (3)
+                                    </button>
+                                    <button class="hover:text-restaurant-primary transition-colors">
+                                        <i class="far fa-comment mr-1"></i> Responder
+                                    </button>
+                                </div>
+                                <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-medium">Verificado</span>
+                            </div>
+                        </div>
+
+                        <!-- Sem avaliações -->
+                        <div id="noReviews" class="hidden text-center py-12">
+                            <i class="fas fa-comments text-gray-300 text-5xl mb-4"></i>
+                            <p class="text-gray-500">Nenhuma avaliação encontrada</p>
+                            <button onclick="clearFilters()" class="mt-4 text-restaurant-primary hover:text-restaurant-dark">
+                                Limpar filtros
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Botão Carregar Mais -->
+                    <div class="mt-6 text-center">
+                        <button onclick="loadMore()" class="bg-white hover:bg-gray-50 text-restaurant-primary border border-restaurant-primary px-6 py-2 rounded-lg transition-colors">
+                            <i class="fas fa-spinner mr-2"></i> Carregar mais avaliações
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Coluna Lateral - Estatísticas -->
+                <div class="space-y-6">
+                    <!-- Distribuição de Notas -->
+                    <div class="bg-white rounded-lg shadow-sm p-6">
+                        <h3 class="font-semibold text-gray-800 mb-4">Distribuição das Avaliações</h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center gap-3">
+                                <span class="text-sm w-4">5</span>
+                                <i class="fas fa-star text-yellow-500 text-sm"></i>
+                                <div class="flex-1 bg-gray-200 rounded-full h-2 overflow-hidden">
+                                    <div class="bg-yellow-500 h-full" style="width: 65%"></div>
+                                </div>
+                                <span class="text-sm text-gray-600 w-10 text-right">65%</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="text-sm w-4">4</span>
+                                <i class="fas fa-star text-yellow-500 text-sm"></i>
+                                <div class="flex-1 bg-gray-200 rounded-full h-2 overflow-hidden">
+                                    <div class="bg-yellow-500 h-full" style="width: 20%"></div>
+                                </div>
+                                <span class="text-sm text-gray-600 w-10 text-right">20%</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="text-sm w-4">3</span>
+                                <i class="fas fa-star text-yellow-500 text-sm"></i>
+                                <div class="flex-1 bg-gray-200 rounded-full h-2 overflow-hidden">
+                                    <div class="bg-yellow-500 h-full" style="width: 10%"></div>
+                                </div>
+                                <span class="text-sm text-gray-600 w-10 text-right">10%</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="text-sm w-4">2</span>
+                                <i class="fas fa-star text-yellow-500 text-sm"></i>
+                                <div class="flex-1 bg-gray-200 rounded-full h-2 overflow-hidden">
+                                    <div class="bg-yellow-500 h-full" style="width: 3%"></div>
+                                </div>
+                                <span class="text-sm text-gray-600 w-10 text-right">3%</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="text-sm w-4">1</span>
+                                <i class="fas fa-star text-yellow-500 text-sm"></i>
+                                <div class="flex-1 bg-gray-200 rounded-full h-2 overflow-hidden">
+                                    <div class="bg-yellow-500 h-full" style="width: 2%"></div>
+                                </div>
+                                <span class="text-sm text-gray-600 w-10 text-right">2%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Top Pratos da Semana -->
+                    <div class="bg-white rounded-lg shadow-sm p-6">
+                        <h3 class="font-semibold text-gray-800 mb-4">
+                            <i class="fas fa-fire text-orange-500 mr-2"></i>
+                            Top Pratos da Semana
+                        </h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium text-gray-800">1. Feijoada Completa</p>
+                                    <div class="flex gap-0.5">
+                                        <i class="fas fa-star text-yellow-500 text-xs"></i>
+                                        <i class="fas fa-star text-yellow-500 text-xs"></i>
+                                        <i class="fas fa-star text-yellow-500 text-xs"></i>
+                                        <i class="fas fa-star text-yellow-500 text-xs"></i>
+                                        <i class="fas fa-star text-yellow-500 text-xs"></i>
+                                    </div>
+                                </div>
+                                <span class="text-sm text-gray-600">4.9</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium text-gray-800">2. Frango Grelhado</p>
+                                    <div class="flex gap-0.5">
+                                        <i class="fas fa-star text-yellow-500 text-xs"></i>
+                                        <i class="fas fa-star text-yellow-500 text-xs"></i>
+                                        <i class="fas fa-star text-yellow-500 text-xs"></i>
+                                        <i class="fas fa-star text-yellow-500 text-xs"></i>
+                                        <i class="fas fa-star-half-alt text-yellow-500 text-xs"></i>
+                                    </div>
+                                </div>
+                                <span class="text-sm text-gray-600">4.7</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium text-gray-800">3. Lasanha</p>
+                                    <div class="flex gap-0.5">
+                                        <i class="fas fa-star text-yellow-500 text-xs"></i>
+                                        <i class="fas fa-star text-yellow-500 text-xs"></i>
+                                        <i class="fas fa-star text-yellow-500 text-xs"></i>
+                                        <i class="fas fa-star text-yellow-500 text-xs"></i>
+                                        <i class="fas fa-star-half-alt text-yellow-500 text-xs"></i>
+                                    </div>
+                                </div>
+                                <span class="text-sm text-gray-600">4.6</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium text-gray-800">4. Peixe Assado</p>
+                                    <div class="flex gap-0.5">
+                                        <i class="fas fa-star text-yellow-500 text-xs"></i>
+                                        <i class="fas fa-star text-yellow-500 text-xs"></i>
+                                        <i class="fas fa-star text-yellow-500 text-xs"></i>
+                                        <i class="fas fa-star text-yellow-500 text-xs"></i>
+                                        <i class="far fa-star text-yellow-500 text-xs"></i>
+                                    </div>
+                                </div>
+                                <span class="text-sm text-gray-600">4.5</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium text-gray-800">5. Strogonoff</p>
+                                    <div class="flex gap-0.5">
+                                        <i class="fas fa-star text-yellow-500 text-xs"></i>
+                                        <i class="fas fa-star text-yellow-500 text-xs"></i>
+                                        <i class="fas fa-star text-yellow-500 text-xs"></i>
+                                        <i class="fas fa-star text-yellow-500 text-xs"></i>
+                                        <i class="far fa-star text-yellow-500 text-xs"></i>
+                                    </div>
+                                </div>
+                                <span class="text-sm text-gray-600">4.4</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Call to Action -->
+                    <div class="bg-gradient-to-br from-restaurant-primary to-restaurant-secondary text-white rounded-lg p-6">
+                        <h3 class="font-semibold mb-3">Já fez sua refeição hoje?</h3>
+                        <p class="text-sm mb-4 opacity-90">Compartilhe sua experiência e ajude a melhorar nossos serviços!</p>
+                        <button onclick="window.location.href='#avaliar'" class="bg-white text-restaurant-primary px-4 py-2 rounded-lg font-medium hover:bg-restaurant-light transition-colors w-full">
+                            Avaliar Refeição
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-restaurant-dark text-white py-8 mt-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div>
+                    <div class="flex items-center space-x-2 mb-3">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                            <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 1 1 0 000 2H6a2 2 0 100 4h2a2 2 0 100-4h-.5a1 1 0 000-2H8a2 2 0 012-2h2a2 2 0 012 2v9a2 2 0 01-2 2H6a2 2 0 01-2-2V5z"/>
+                        </svg>
+                        <h3 class="text-xl font-bold">Le Menu</h3>
+                    </div>
+                    <p class="text-sm text-gray-300">Sistema de Gestão do Restaurante Universitário UNIFESSPA</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-3">Links Rápidos</h4>
+                    <ul class="space-y-2 text-sm text-gray-300">
+                        <li><a href="#" class="hover:text-white transition-colors">Cardápio</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Fazer Reserva</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Avaliar Refeição</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Avisos</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-3">Contato</h4>
+                    <ul class="space-y-2 text-sm text-gray-300">
+                        <li><i class="fas fa-phone mr-2"></i> (94) 2101-7100</li>
+                        <li><i class="fas fa-envelope mr-2"></i> ru@unifesspa.edu.br</li>
+                        <li><i class="fas fa-clock mr-2"></i> Seg-Sex: 6:30 - 20:00</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-3">Siga-nos</h4>
+                    <div class="flex space-x-3">
+                        <a href="#" class="bg-white/20 hover:bg-white/30 w-10 h-10 rounded-lg flex items-center justify-center transition-colors">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="bg-white/20 hover:bg-white/30 w-10 h-10 rounded-lg flex items-center justify-center transition-colors">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="bg-white/20 hover:bg-white/30 w-10 h-10 rounded-lg flex items-center justify-center transition-colors">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-6 pt-6 text-center text-sm text-gray-400">
+                <p>&copy; 2024 Le Menu - Restaurante Universitário UNIFESSPA. Todos os direitos reservados.</p>
+                <p class="mt-2">Desenvolvido com <i class="fas fa-heart text-red-500"></i> para nossa comunidade acadêmica</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Buscar nas avaliações
+        function searchReviews() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const reviews = document.querySelectorAll('.review-card');
+
+            reviews.forEach(review => {
+                const text = review.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    review.style.display = 'block';
+                    // Destacar termo buscado
+                    if (searchTerm) {
+                        const content = review.querySelector('p.text-gray-700');
+                        if (content) {
+                            const originalText = content.textContent;
+                            const regex = new RegExp(`(${searchTerm})`, 'gi');
+                            content.innerHTML = originalText.replace(regex, '<span class="highlight">$1</span>');
+                        }
+                    }
+                } else {
+                    review.style.display = 'none';
+                }
+            });
+
+            updateReviewCount();
+        }
+
+        // Filtrar avaliações
+        function filterReviews() {
+            const mealFilter = document.getElementById('mealFilter').value;
+            const ratingFilter = document.getElementById('ratingFilter').value;
+
+            // Implementar lógica de filtro
+            updateReviewCount();
+        }
+
+        // Atualizar contador
+        function updateReviewCount() {
+            const visibleReviews = document.querySelectorAll('.review-card:not([style*="display: none"])').length;
+            document.getElementById('reviewCount').textContent = visibleReviews;
+
+            if (visibleReviews === 0) {
+                document.getElementById('noReviews').classList.remove('hidden');
+            } else {
+                document.getElementById('noReviews').classList.add('hidden');
+            }
+        }
+
+        // Limpar filtros
+        function clearFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('mealFilter').value = '';
+            document.getElementById('ratingFilter').value = '';
+            searchReviews();
+        }
+
+        // Carregar mais avaliações (simulado)
+        function loadMore() {
+            const button = event.target;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Carregando...';
+
+            setTimeout(() => {
+                // Simular carregamento
+                alert('Mais avaliações carregadas!');
+                button.innerHTML = '<i class="fas fa-spinner mr-2"></i> Carregar mais avaliações';
+            }, 1000);
+        }
+
+        // Toggle mobile menu
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            const button = document.getElementById('mobile-menu-button');
+            const isExpanded = button.getAttribute('aria-expanded') === 'true';
+
+            mobileMenu.classList.toggle('hidden');
+            button.setAttribute('aria-expanded', !isExpanded);
+
+            // Update button icon
+            const icon = button.querySelector('svg');
+            if (isExpanded) {
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>';
+                button.setAttribute('aria-label', 'Abrir menu de navegação');
+            } else {
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>';
+                button.setAttribute('aria-label', 'Fechar menu de navegação');
+
+            }
+        }
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', () => {
+            // Animações
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+
+                        entry.target.classList.add('fade-in');
+                    }
+                });
+            });
+
+            document.querySelectorAll('.review-card, .fade-in').forEach(el => {
+                observer.observe(el);
+            });
+
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', (e) => {
+                const mobileMenu = document.getElementById('mobile-menu');
+                const button = document.getElementById('mobile-menu-button');
+
+                if (!button.contains(e.target) && !mobileMenu.contains(e.target)) {
+                    mobileMenu.classList.add('hidden');
+                    button.setAttribute('aria-expanded', 'false');
+                    button.setAttribute('aria-label', 'Abrir menu de navegação');
+                    const icon = button.querySelector('svg');
+                    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>';
+                }
+            });
+        });
+        function handleLogout() {
+            if (confirm('Deseja sair do sistema?')) {
+                try { localStorage.clear(); } catch (e) {}
+                alert('Logout realizado com sucesso!');
+                window.location.reload();
+            }
+        }
+    </script>
+</body>
+</html>
