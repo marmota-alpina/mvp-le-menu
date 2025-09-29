@@ -15,12 +15,12 @@ Para usuários, o sistema permite visualizar o cardápio, fazer reservas, avalia
 # MVP Canvas
 ![](mvp-canvas.png)
 # Cronograma
-![](jira/le_menu_cronograma.png)
+![](backlog-completo/le_menu_cronograma.png)
 # Páginas HTML
 
-* [Index](prototipos/html-pages/index.html)
-* [Consulta de Cardápio](prototipos/html-pages/lemenu-consulta-cardapio.html)
-* [Cadastro de Cardápio](prototipos/html-pages/lemenu-cadastro-cardapio.html)
-* [Avaliar Refeição](prototipos/html-pages/lemenu-avaliar-refeicao.html)
-* [Consultar Avaliações](prototipos/html-pages/lemenu-consultar-avaliacoes.html)
-* [Gestão de Avisos](prototipos/html-pages/lemenu-gestao-avisos.html)
+* [Index](wireframes/html-pages/index.html)
+* [Consulta de Cardápio](wireframes/html-pages/lemenu-consulta-cardapio.html)
+* [Cadastro de Cardápio](wireframes/html-pages/lemenu-cadastro-cardapio.html)
+* [Avaliar Refeição](wireframes/html-pages/lemenu-avaliar-refeicao.html)
+* [Consultar Avaliações](wireframes/html-pages/lemenu-consultar-avaliacoes.html)
+* [Gestão de Avisos](wireframes/html-pages/lemenu-gestao-avisos.html)
