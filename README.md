@@ -11,6 +11,7 @@ Para usuários, o sistema permite visualizar o cardápio, fazer reservas, avalia
 * [Miro MVP Canvas](https://miro.com/welcomeonboard/OS9SU28vK3lMSFIwVndSVWFZRDZ1WGdEd3NsQlBYSkZnZzBCbUo5VzdoRWJTR0QyVk5wK1dsL1JnaUFibW9UTlVEeWpPUU5QVVpFdDNqQTFYTnhUcVdVZlFUZk4zVklLWGxiR1NBZnEvazJXL0Yvb09NRnRaSEFxcEh1TzBkNFlBS2NFMDFkcUNFSnM0d3FEN050ekl3PT0hdjE=?share_link_id=145712470062)
 # Sequenciador
 ![](sequenciador.png)
+
 # MVP Canvas
 ![](mvp-canvas.png)
 # Cronograma
